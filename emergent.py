@@ -235,6 +235,7 @@ class SimpleSynaesthesiaNet(nn.Module):
     self.losses = torch.tensor(torch.zeros(int((max_iter)/self.time_step),2))
     self.variances = torch.tensor(torch.zeros(int((max_iter)/self.time_step), self.modalities))
     self.critical_etas = torch.tensor(torch.zeros(int((max_iter)/self.time_step)))
+    self.x = x
     orig_ts = torch.linspace(0., int((max_iter)/self.time_step), max_iter)
     samp_ts = orig_ts
     # s1 = self.s1.clone()
@@ -295,8 +296,8 @@ class SimpleSynaesthesiaNet(nn.Module):
   def dynamics(self, t,x, s):
     # print((self.W1 @ x[0] + self.K[0][1].clone() * s[1]))
     s1, s2 = s
-    s1_dt =-s1 + self.g(self.W1 @ x[0] + self.K[0][1].clone() * s2)/self.tau
-    s2_dt = -s2 + self.g(self.W2 @ x[1] + self.K[1][0].clone() * s1)/self.tau
+    s1_dt =-s1 + self.g(self.W1 @ self.x[0] + self.K[0][1].clone() * s2)/self.tau
+    s2_dt = -s2 + self.g(self.W2 @ self.x[1] + self.K[1][0].clone() * s1)/self.tau
     return torch.stack([s1_dt, s2_dt])
   def logistic_derivative(self,x):
     return self.g(x) * (1 - self.g(x))
