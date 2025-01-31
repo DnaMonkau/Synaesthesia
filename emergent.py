@@ -10,6 +10,8 @@ import os
 import imageio
 from torchdiffeq import odeint
 import cv2
+import torch.distributions as tdist
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class SimpleSynaesthesiaNet(nn.Module):
