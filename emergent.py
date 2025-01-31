@@ -306,37 +306,40 @@ def run():
   #syn
   syn=[]
   ks = []
-
-  net = SynaesthesiaNet(np.shape(x), 2)
-  net_non = SynaesthesiaNet(np.shape(x), 2, cross_talk=False)
-  weights1 = net.W1
-  weights2 = net_non.W1
-  for i in range(100):
-    x1 = n.sample((2,)).float()[:,0] # modality 1
-    x2 = n.sample((2,)).float()[:,0]# modality 2 adjust variances for analysis
-    print(x1, x2)
-    x = torch.stack([x1, x2])
-    net = SynaesthesiaNet(np.shape(x), 2)
-    net_non = SynaesthesiaNet(np.shape(x), 2, cross_talk=False)
-
-    net.W1 = weights1
-    net.W2 = weights2
-    net.forward(x, max_iter = 3000)
-    print('Finalised synaesthetic simulations')
-    # non syn
-    net_non.W1 = weights1
-    net_non.W2 = weights2
-    net_non.cross_talk = False
-    net_non.forward(x, max_iter = 3000)
-    print('Finalised non-synaesthetic simulations')
-    # Calculate Synaesthetic Baseline
-    Synaesthesia_s = torch.stack([net.s1, net_non.s1])
-    Non_Synaesthesia_s = torch.stack([net.s2, net_non.s2])
-
-    Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
-    syn.append(Isynaesthesia)
-    ks.append(net.K)
-  df = pd.DataFrame({'K':ks, 'Stability Output':syn })
+  variances = np.linspace(0.01, 0.25, 5)
+  k=np.random.choice(np.linspace(-0.01,0.01),2)
+  plots = []
+  plots2 = []
+  W1 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
+  W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
+  outs =[]
+  vs=[]
+  for i in variances:
+    for j in variances:
+  
+      n = tdist.Normal(0, torch.sqrt(torch.tensor([i])))
+      n2 = tdist.Normal(0, torch.sqrt(torch.tensor([j])))
+      x1 = n.sample((1,)).float()[:,0] # modality 1
+      x2 = n2.sample((1,)).float()[:,0] # modality 2 adjust variances for analysis
+      x = torch.stack([x1, x2])
+  
+      net = SimpleSynaesthesiaNet(np.shape(x), 1)
+      # consistent weights
+      net.K = nn.Parameter(torch.tensor([[0, k[0]], [k[1],0]]))
+      net.W1 = W1
+      net.W2 = W2
+      # print(np.shape(x), x)
+      out = net.forward(x, 150)
+      # if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
+      if out[-1] == 'Stable':
+        plots.append([i, j, 1]) # no cross-talk present
+      else:
+        plots2.append([i, j, 0])
+        print('unstable')
+      outs.append(out)
+      vs.append([variances[i], variances[j])
+      ks.append(net.K)
+  df = pd.DataFrame({'K':ks, 'Stability Output':outs, 'Plot No cross': plots, 'Plot cross':plots2, 'Variances': vs })
   return df
 df = run()
 df.to_csv('Emergent Synaesthesia.csv')
