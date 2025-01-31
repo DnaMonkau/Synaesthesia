@@ -310,7 +310,7 @@ def run():
   #syn
   syn=[]
   ks = []
-  variances = np.linspace(0.01, 0.25, 79)
+  variances = np.linspace(0.01, 0.25, 27)
   k=np.random.choice(np.linspace(-0.01,0.01),2)
   plots = []
   plots2 = []
@@ -333,7 +333,7 @@ def run():
       net.W1 = W1
       net.W2 = W2
       # print(np.shape(x), x)
-      out = net.forward(x, 1000)
+      out = net.forward(x, 500)
       if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
       # if out[-1] == 'Stable':
         plots.append([variances[i], variances[j], 1]) # no cross-talk present
