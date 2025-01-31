@@ -76,7 +76,7 @@ class SimpleSynaesthesiaNet(nn.Module):
     # self.s1 = s1 + (s_delta1 / self.tau)
     # self.s2 = s2 + (s_delta2 / self.tau)
     s = torch.stack([s1, s2])
-    self.s1, self.s2 = odeint(self.dynamics, s, samp_ts)[-1]
+    self.s1, self.s2 = odeint(self.dynamics, x, s, samp_ts)[-1]
 
     return
 
@@ -292,7 +292,7 @@ class SimpleSynaesthesiaNet(nn.Module):
 
 
   #helper functions
-  def dynamics(self, t, s):
+  def dynamics(self, t,x, s):
     # print((self.W1 @ x[0] + self.K[0][1].clone() * s[1]))
     s1, s2 = s
     s1_dt =-s1 + self.g(self.W1 @ x[0] + self.K[0][1].clone() * s2)/self.tau
