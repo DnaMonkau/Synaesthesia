@@ -344,6 +344,12 @@ def run():
       vs.append([variances[i], variances[j]])
       ks.append(net.K)
   # df = pd.DataFrame()
+  pd.DataFrame({ks}).to_csv('EmergentSynaesthesiaks.csv')
+  pd.DataFrame({outs}).to_csv('EmergentSynaesthesiaouts.csv')
+  pd.DataFrame({plots}).to_csv('EmergentSynaesthesiapl.csv')
+  pd.DataFrame({plots2}).to_csv('EmergentSynaesthesiapl2.csv')
+  pd.DataFrame({vs}).to_csv('EmergentSynaesthesiavs.csv')
+
   return ks, outs, plots, plots2, vs 
 df = run()
 df.to_csv('Emergent Synaesthesia.csv')
