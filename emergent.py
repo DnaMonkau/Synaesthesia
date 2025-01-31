@@ -321,13 +321,13 @@ def run()
 
     net.W1 = weights1
     net.W2 = weights2
-    net.forward(x, max_iter = 100)
+    net.forward(x, max_iter = 3000)
     print('Finalised synaesthetic simulations')
     # non syn
     net_non.W1 = weights1
     net_non.W2 = weights2
     net_non.cross_talk = False
-    net_non.forward(x, max_iter = 100)
+    net_non.forward(x, max_iter = 3000)
     print('Finalised non-synaesthetic simulations')
     # Calculate Synaesthetic Baseline
     Synaesthesia_s = torch.stack([net.s1, net_non.s1])
