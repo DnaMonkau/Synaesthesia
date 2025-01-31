@@ -76,7 +76,7 @@ class SimpleSynaesthesiaNet(nn.Module):
     # self.s1 = s1 + (s_delta1 / self.tau)
     # self.s2 = s2 + (s_delta2 / self.tau)
     s = torch.stack([s1, s2])
-    self.s1, self.s2 = odeint(self.dynamics, s, samp_ts, args = (x,))[-1]
+    self.s1, self.s2 = odeint(self.dynamics, s, samp_ts)[-1]
 
     return
 
