@@ -317,11 +317,11 @@ def run():
   W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
   outs =[]
   vs=[]
-  for i in variances:
-    for j in variances:
+  for i in range(len(variances)):
+    for j in range(len(variances)):
   
-      n = tdist.Normal(0, torch.sqrt(torch.tensor([i])))
-      n2 = tdist.Normal(0, torch.sqrt(torch.tensor([j])))
+      n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
+      n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
       x1 = n.sample((1,)).float()[:,0] # modality 1
       x2 = n2.sample((1,)).float()[:,0] # modality 2 adjust variances for analysis
       x = torch.stack([x1, x2])
@@ -335,12 +335,12 @@ def run():
       out = net.forward(x, 150)
       # if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
       if out[-1] == 'Stable':
-        plots.append([i, j, 1]) # no cross-talk present
+        plots.append([variances[i], variances[j], 1]) # no cross-talk present
       else:
-        plots2.append([i, j, 0])
+        plots2.append([variances[i], variances[j], 0])
         print('unstable')
       outs.append(out)
-      vs.append([variances[i], variances[j]])
+      vs.append([variancse[i], variances[j]])
       ks.append(net.K)
   df = pd.DataFrame({'K':ks, 'Stability Output':outs, 'Plot No cross': plots, 'Plot cross':plots2, 'Variances': vs })
   return df
