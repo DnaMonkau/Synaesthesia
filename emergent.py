@@ -343,7 +343,7 @@ def run():
       outs.append(out)
       vs.append([variances[i], variances[j]])
       ks.append(net.K)
-  df = pd.DataFrame({'K':ks, 'Stability Output':outs, 'Plot No cross': plots, 'Plot cross':plots2, 'Variances': vs })
-  return df
+  # df = pd.DataFrame()
+  return ks, outs, plots, plots2, vs 
 df = run()
 df.to_csv('Emergent Synaesthesia.csv')
