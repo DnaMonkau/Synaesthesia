@@ -362,4 +362,5 @@ def make_fig(plots, plots2):
   # plt.title()
   plt.xlabel('Varianance unit #1')
   plt.ylabel('Varianance unit #2')
-make_fig(run())
+plots, plots2 = run()
+make_fig(plots, plots2)
