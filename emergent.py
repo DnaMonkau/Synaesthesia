@@ -334,8 +334,8 @@ def run():
       net.W2 = W2
       # print(np.shape(x), x)
       out = net.forward(x, 10)
-      # if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
-      if out[-1] == 'Stable':
+      if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
+      # if out[-1] == 'Stable':
         plots.append([variances[i], variances[j], 1]) # no cross-talk present
       else:
         plots2.append([variances[i], variances[j], 0])
@@ -345,11 +345,21 @@ def run():
       ks.append(net.K)
   # df = pd.DataFrame()
   # pd.DataFrame({ks}).to_csv('EmergentSynaesthesiaks.csv')
-  pd.DataFrame({outs}).to_csv('EmergentSynaesthesiaouts.csv')
-  pd.DataFrame({plots}).to_csv('EmergentSynaesthesiapl.csv')
-  pd.DataFrame({plots2}).to_csv('EmergentSynaesthesiapl2.csv')
-  pd.DataFrame({vs}).to_csv('EmergentSynaesthesiavs.csv')
+  # pd.DataFrame({outs}).to_csv('EmergentSynaesthesiaouts.csv')
+  # pd.DataFrame({plots}).to_csv('EmergentSynaesthesiapl.csv')
+  # pd.DataFrame({plots2}).to_csv('EmergentSynaesthesiapl2.csv')
+  # pd.DataFrame({vs}).to_csv('EmergentSynaesthesiavs.csv')
 
-  return ks, outs, plots, plots2, vs 
-df = run()
-df.to_csv('Emergent Synaesthesia.csv')
+  return plots, plots2
+def make_fig(plots, plots2):
+  for i in range(len(plots)):
+    plt.scatter(plots[i][0], plots[i][1], color ='green')
+  for i in range(len(plots2)):
+    plt.scatter(plots2[i][0], plots2[i][1], color = 'red')
+  plt.savefig('test.jpeg')
+  # plt.xlim([0, 0.25])
+  # plt.ylim([0, 0.25])
+  # plt.title()
+  plt.xlabel('Varianance unit #1')
+  plt.ylabel('Varianance unit #2')
+make_fig(run())
