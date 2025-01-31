@@ -340,7 +340,7 @@ def run():
         plots2.append([variances[i], variances[j], 0])
         print('unstable')
       outs.append(out)
-      vs.append([variancse[i], variances[j]])
+      vs.append([variances[i], variances[j]])
       ks.append(net.K)
   df = pd.DataFrame({'K':ks, 'Stability Output':outs, 'Plot No cross': plots, 'Plot cross':plots2, 'Variances': vs })
   return df
