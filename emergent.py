@@ -293,7 +293,7 @@ class SimpleSynaesthesiaNet(nn.Module):
 
 
   #helper functions
-  def dynamics(self, t,x, s):
+  def dynamics(self, t, s):
     # print((self.W1 @ x[0] + self.K[0][1].clone() * s[1]))
     s1, s2 = s
     s1_dt =-s1 + self.g(self.W1 @ self.x[0] + self.K[0][1].clone() * s2)/self.tau
