@@ -310,7 +310,7 @@ def run():
   #syn
   syn=[]
   ks = []
-  variances = np.linspace(0.01, 0.25, 2)
+  variances = np.linspace(0.01, 0.25, 79)
   k=np.random.choice(np.linspace(-0.01,0.01),2)
   plots = []
   plots2 = []
