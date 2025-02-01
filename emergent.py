@@ -306,7 +306,7 @@ class SimpleSynaesthesiaNet(nn.Module):
     return self.logistic_derivative(x) * (1 - 2*self.g(x))
   def third_logistic_derivative(self, x):
     return self.second_logistic_derivative(x)* (1 - 2*self.g(x)) - 2*self.logistic_derivative(x)**2
-def run():
+def run( it, it2):
   #syn
   syn=[]
   ks = []
@@ -318,8 +318,8 @@ def run():
   W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
   outs =[]
   vs=[]
-  for i in range(len(variances)):
-    for j in range(len(variances[:13])):
+  for i in range(len(variances[:it])):
+    for j in range(len(variances[:it2])):
   
       n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
       n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
@@ -363,5 +363,5 @@ def make_fig(plots, plots2):
   # plt.title()
   plt.xlabel('Varianance unit #1')
   plt.ylabel('Varianance unit #2')
-plots, plots2 = run()
+plots, plots2 = run(5, 5)
 make_fig(plots, plots2)
