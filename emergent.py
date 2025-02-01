@@ -318,8 +318,8 @@ def run():
   W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
   outs =[]
   vs=[]
-  for i in range(len(variances[20:])):
-    for j in range(len(variances[20:])):
+  for i in range(len(variances[24:])):
+    for j in range(len(variances[24:])):
   
       n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
       n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
