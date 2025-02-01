@@ -319,7 +319,7 @@ def run():
   outs =[]
   vs=[]
   for i in range(len(variances)):
-    for j in range(len(variances)):
+    for j in range(len(variances[:13])):
   
       n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
       n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
@@ -333,13 +333,14 @@ def run():
       net.W1 = W1
       net.W2 = W2
       # print(np.shape(x), x)
-      out = net.forward(x, 500)
+      out = net.forward(x, 1500)
       if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
       # if out[-1] == 'Stable':
         plots.append([variances[i], variances[j], 1]) # no cross-talk present
       else:
         plots2.append([variances[i], variances[j], 0])
         print('unstable')
+        print(net.K)
       outs.append(out)
       vs.append([variances[i], variances[j]])
       ks.append(net.K)
