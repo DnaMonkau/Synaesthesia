@@ -353,11 +353,11 @@ for i in range(len(variances[24:])):
 
 # return plots, plots2
 def make_fig(plots, plots2):
-for i in range(len(plots)):
-  plt.scatter(plots[i][0], plots[i][1], color ='green')
-for i in range(len(plots2)):
-  plt.scatter(plots2[i][0], plots2[i][1], color = 'red')
-plt.savefig('test.jpeg')
+  for i in range(len(plots)):
+    plt.scatter(plots[i][0], plots[i][1], color ='green')
+  for i in range(len(plots2)):
+    plt.scatter(plots2[i][0], plots2[i][1], color = 'red')
+  plt.savefig('test.jpeg')
 # plt.xlim([0, 0.25])
 # plt.ylim([0, 0.25])
 # plt.title()
