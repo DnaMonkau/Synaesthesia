@@ -306,62 +306,62 @@ class SimpleSynaesthesiaNet(nn.Module):
     return self.logistic_derivative(x) * (1 - 2*self.g(x))
   def third_logistic_derivative(self, x):
     return self.second_logistic_derivative(x)* (1 - 2*self.g(x)) - 2*self.logistic_derivative(x)**2
-def run():
-  #syn
-  syn=[]
-  ks = []
-  variances = np.linspace(0.01, 0.25, 27)
-  k=np.random.choice(np.linspace(-0.01,0.01),2)
-  plots = []
-  plots2 = []
-  W1 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
-  W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
-  outs =[]
-  vs=[]
-  for i in range(len(variances[24:])):
-    for j in range(len(variances[24:])):
-  
-      n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
-      n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
-      x1 = n.sample((1,)).float()[:,0] # modality 1
-      x2 = n2.sample((1,)).float()[:,0] # modality 2 adjust variances for analysis
-      x = torch.stack([x1, x2])
-  
-      net = SimpleSynaesthesiaNet(np.shape(x), 1)
-      # consistent weights
-      net.K = nn.Parameter(torch.tensor([[0, k[0]], [k[1],0]]))
-      net.W1 = W1
-      net.W2 = W2
-      # print(np.shape(x), x)
-      out = net.forward(x, 1500)
-      if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
-      # if out[-1] == 'Stable':
-        plots.append([variances[i], variances[j], 1]) # no cross-talk present
-      else:
-        plots2.append([variances[i], variances[j], 0])
-        print('unstable')
-        print(net.K)
-      outs.append(out)
-      vs.append([variances[i], variances[j]])
-      ks.append(net.K)
-  # df = pd.DataFrame()
-  # pd.DataFrame({ks}).to_csv('EmergentSynaesthesiaks.csv')
-  # pd.DataFrame({outs}).to_csv('EmergentSynaesthesiaouts.csv')
-  # pd.DataFrame({plots}).to_csv('EmergentSynaesthesiapl.csv')
-  # pd.DataFrame({plots2}).to_csv('EmergentSynaesthesiapl2.csv')
-  # pd.DataFrame({vs}).to_csv('EmergentSynaesthesiavs.csv')
+# def run():
+#syn
+syn=[]
+ks = []
+variances = np.linspace(0.01, 0.25, 27)
+k=np.random.choice(np.linspace(-0.01,0.01),2)
+plots = []
+plots2 = []
+W1 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
+W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
+outs =[]
+vs=[]
+for i in range(len(variances[24:])):
+  for j in range(len(variances[24:])):
 
-  return plots, plots2
+    n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
+    n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
+    x1 = n.sample((1,)).float()[:,0] # modality 1
+    x2 = n2.sample((1,)).float()[:,0] # modality 2 adjust variances for analysis
+    x = torch.stack([x1, x2])
+
+    net = SimpleSynaesthesiaNet(np.shape(x), 1)
+    # consistent weights
+    net.K = nn.Parameter(torch.tensor([[0, k[0]], [k[1],0]]))
+    net.W1 = W1
+    net.W2 = W2
+    # print(np.shape(x), x)
+    out = net.forward(x, 1500)
+    if abs(net.K[0][1]) < 1 and abs(net.K[1][0]) < 1:
+    # if out[-1] == 'Stable':
+      plots.append([variances[i], variances[j], 1]) # no cross-talk present
+    else:
+      plots2.append([variances[i], variances[j], 0])
+      print('unstable')
+      print(net.K)
+    outs.append(out)
+    vs.append([variances[i], variances[j]])
+    ks.append(net.K)
+# df = pd.DataFrame()
+# pd.DataFrame({ks}).to_csv('EmergentSynaesthesiaks.csv')
+# pd.DataFrame({outs}).to_csv('EmergentSynaesthesiaouts.csv')
+# pd.DataFrame({plots}).to_csv('EmergentSynaesthesiapl.csv')
+# pd.DataFrame({plots2}).to_csv('EmergentSynaesthesiapl2.csv')
+# pd.DataFrame({vs}).to_csv('EmergentSynaesthesiavs.csv')
+
+# return plots, plots2
 def make_fig(plots, plots2):
-  for i in range(len(plots)):
-    plt.scatter(plots[i][0], plots[i][1], color ='green')
-  for i in range(len(plots2)):
-    plt.scatter(plots2[i][0], plots2[i][1], color = 'red')
-  plt.savefig('test.jpeg')
-  # plt.xlim([0, 0.25])
-  # plt.ylim([0, 0.25])
-  # plt.title()
-  plt.xlabel('Varianance unit #1')
-  plt.ylabel('Varianance unit #2')
-plots, plots2 = run()
+for i in range(len(plots)):
+  plt.scatter(plots[i][0], plots[i][1], color ='green')
+for i in range(len(plots2)):
+  plt.scatter(plots2[i][0], plots2[i][1], color = 'red')
+plt.savefig('test.jpeg')
+# plt.xlim([0, 0.25])
+# plt.ylim([0, 0.25])
+# plt.title()
+plt.xlabel('Varianance unit #1')
+plt.ylabel('Varianance unit #2')
+# plots, plots2 = run()
 make_fig(plots, plots2)
