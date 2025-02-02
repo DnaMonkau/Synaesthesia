@@ -77,7 +77,7 @@ class SimpleSynaesthesiaNet(nn.Module):
     # self.s1 = s1 + (s_delta1 / self.tau)
     # self.s2 = s2 + (s_delta2 / self.tau)
     s = torch.stack([s1, s2])
-    self.s1, self.s2 = odeint(self.dynamics, s, samp_ts)[-1]
+    self.s1, self.s2 = odeint(self.dynamics, s, samp_ts[:t+1)[-1]
 
     return
 
@@ -237,7 +237,7 @@ class SimpleSynaesthesiaNet(nn.Module):
     self.variances = torch.tensor(torch.zeros(int((max_iter)/self.time_step), self.modalities))
     self.critical_etas = torch.tensor(torch.zeros(int((max_iter)/self.time_step)))
     self.x = x
-    orig_ts = torch.linspace(0., int((max_iter)/self.time_step), max_iter)
+    orig_ts = torch.linspace(0., int((max_iter)/self.time_step)+1, max_iter)
     samp_ts = orig_ts
     # s1 = self.s1.clone()
     # s2 = self.s2.clone()
