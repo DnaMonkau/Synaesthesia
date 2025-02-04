@@ -262,7 +262,7 @@ def run():
   #syn
   syn=[]
   ks = []
-  variances = np.linspace(0.01, 0.25, 3)
+  variances = np.linspace(0.01, 0.25, 4)
   # Generate random angles
   theta = 2 * np.pi * torch.rand(1)
 
@@ -312,11 +312,9 @@ def run():
           plots2.append([variances[i], variances[j], 0])
           print('unstable')
           print(net.K)
-      plt.plot(out)
       outs.append(out)
       vs.append([variances[i], variances[j]])
       ks.append(net.K)
-      plt.show()
   # df = pd.DataFrame()
   # pd.DataFrame({ks}).to_csv('EmergentSynaesthesiaks.csv')
   # pd.DataFrame({outs}).to_csv('EmergentSynaesthesiaouts.csv')
