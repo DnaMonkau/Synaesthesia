@@ -262,7 +262,7 @@ def run():
   #syn
   syn=[]
   ks = []
-  variances = np.linspace(0.01, 0.25, 2)
+  variances = np.linspace(0.01, 0.25, 4)
   # Generate random angles
   theta = 2 * np.pi * torch.rand(1)
 
@@ -295,7 +295,7 @@ def run():
       net.W1 = W1
       net.W2 = W2
       # print(np.shape(x), x)
-      out = net.forward(x,10)
+      out = net.forward(x,500)
       if torch.round(abs(net.K[0][1]), decimals=1) < 1.5 and torch.round(abs(net.K[1][0]), decimals=1) < 1.5:
       # if out[-1] == 'Stable':
         plots.append([variances[i], variances[j], 1]) # no cross-talk present
@@ -330,7 +330,7 @@ def make_fig(plots, plots2, plots3):
     plt.scatter(plots2[i][0], plots2[i][1], color = 'red')
   for i in range(len(plots3)):
     plt.scatter(plots3[i][0], plots3[i][1], color = 'orange')    
-  plt.savefig('../denmon/Synaesthesia/test.jpeg')
+  plt.savefig('../Synaesthesia/out.jpeg')
   # plt.xlim([0, 0.25])
   # plt.ylim([0, 0.25])
   # plt.title()
