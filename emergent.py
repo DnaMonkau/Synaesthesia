@@ -262,7 +262,7 @@ def run():
   #syn
   syn=[]
   ks = []
-  variances = np.linspace(0.01, 0.25, 3)
+  variances = np.linspace(0.01, 0.25, 4)
   # Generate random angles
   theta = 2 * np.pi * torch.rand(1)
 
@@ -303,15 +303,15 @@ def run():
       else:
         if out[-1] == 'Stable' and torch.round(abs(net.K[0][1]) - abs(net.K[1][0]), decimals=1) > 1.5:
           plots3.append([variances[i], variances[j],2])
-          print('unsure')
-          print(net.K)
+          # print('unsure')
+          # print(net.K)
         elif out[-1] == 'Stable':
-          plots.append([variances[i], variances[j], 1]) # no cross-talk present
-          print('unsure stable')
+          plots.append([variances[i], variances[j], 2]) # no cross-talk present
+          # print('unsure stable')
         else:
           plots2.append([variances[i], variances[j], 0])
-          print('unstable')
-          print(net.K)
+          # print('unstable')
+          # print(net.K)
       outs.append(out)
       vs.append([variances[i], variances[j]])
       ks.append(net.K)
