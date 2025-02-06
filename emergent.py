@@ -262,7 +262,7 @@ def run():
   #syn
   syn=[]
   ks = []
-  variances = np.linspace(0.01, 0.25, 4)
+  variances = np.linspace(0.01, 0.25, 3)
   # Generate random angles
   theta = 2 * np.pi * torch.rand(1)
 
@@ -295,7 +295,7 @@ def run():
       net.W1 = W1
       net.W2 = W2
       # print(np.shape(x), x)
-      out = net.forward(x,500)
+      out = net.forward(x,1000)
       if torch.round(abs(net.K[0][1]), decimals=1) < 1.5 and torch.round(abs(net.K[1][0]), decimals=1) < 1.5:
       # if out[-1] == 'Stable':
         plots.append([variances[i], variances[j], 1]) # no cross-talk present
