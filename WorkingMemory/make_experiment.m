@@ -55,20 +55,27 @@ end
 
 function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
     if nargin < 6
+       
         thr = 127; % important  for signal transfer og =127 for < 127
     end
+    % test shuffle only image dimensions
     if length(dimensions) == 3
-        for i= 1:dimensions(end)
-            image(:,:, i)  = image(:,:, i) > thr;
-        end
+        image = image > thr;
+        img = image;
+        p = randperm(prod(dimensions));
+        b = p(1 : uint16(prod(dimensions) * variance));
+        img(b) = ~img(b);
+        image = img;
+        
     elseif length(dimensions) == 2
         image = image < thr;
+        p = randperm(prod(dimensions));
+        b = p(1 : uint16(prod(dimensions) * variance));
+        image(b) = ~image(b);
     end
     % shifts pixels around and binary flips images
   
-    p = randperm(prod(dimensions));
-    b = p(1 : uint16(prod(dimensions) * variance));
-    image(b) = ~image(b);
+    
     
     image = double(image) .* Iapp0; 
 end

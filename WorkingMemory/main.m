@@ -6,7 +6,7 @@ try
     rng(42);
     
     params = model_parameters(true);
-    disp('Parameters defined');
+    % disp('Parameters defined');
     model = init_model();
     % disp('Model defined');
     % define amount of neurons dynamically

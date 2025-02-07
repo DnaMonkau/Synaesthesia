@@ -44,7 +44,7 @@ function [Post_line,Pre] = create_connections(dimensions)
             fi = 2 * pi * rand(1, ties_stock);
             XY(1,:) = fix(R .* cos(fi));
             XY(2,:) = fix(R .* sin(fi));
-            XY(3,:) = fix(R .*cos(fi) .*sin(fi));
+            % XY(3,:) = fix(R .*cos(fi) .*sin(fi)); % check with this off
             XY1 = unique(XY', 'row','stable');
             XY = XY1';
             n = 1;
@@ -59,7 +59,8 @@ function [Post_line,Pre] = create_connections(dimensions)
                     pp = 1;
                 else pp = 0;
                 end
-                if (x > 0 && y > 0  && y > 0 && x <= dimensions(1) && y <= dimensions(2) && z <= dimensions(3) && pp == 0)
+                % if (x > 0 && y > 0  && z > 0 && x <= dimensions(1) && y <= dimensions(2) && z <= dimensions(3) && pp == 0) 
+                if (x > 0 && y > 0  && z > 0 && x <= dimensions(1) && y <= dimensions(2) && z <= dimensions(3) && pp == 0) 
                     Post(i,j,p,n) = sub2ind(size(Post_for_one), x, y, z);
                     n = n + 1;
                 end

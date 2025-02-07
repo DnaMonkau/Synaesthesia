@@ -7,7 +7,7 @@ function [neuron_astrozone_activity, neuron_astrozone_spikes] = ...
     glutamate_above_thr = reshape(G >= 0.7, dimensions);
     neuron_astrozone_activity = zeros(params.mastro, params.nastro, 'int8');
     neuron_astrozone_spikes = zeros(params.mastro, params.nastro, 'int8');
-    kernel = [params.az, params.az;params.az, params.az];
+    % kernel = [params.az, params.az;params.az, params.az];
     % sj = 0;
     % for j = 1 : params.az : (dimensions(1) - params.az)
     %     sk = 0;
