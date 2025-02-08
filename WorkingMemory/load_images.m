@@ -1,5 +1,5 @@
 function [dimensions, images] = load_images()
-    images_dir = 'images/';
+    images_dir = 'images\';
     image_names = {
         'zero.jpg', ...
         'one.jpg', ...
@@ -37,7 +37,7 @@ function [dimensions, images] = load_images()
         'nine_binare_color.jpg'
     };
     images = {};
-    for name = bin_color_image_names;
+    for name = image_names;
         image = imread(fullfile(images_dir, name{1}));        
         % image = rgb2gray(image);
         images{end + 1} = image;

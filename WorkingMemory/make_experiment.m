@@ -60,7 +60,7 @@ function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
     end
     % test shuffle only image dimensions
     if length(dimensions) == 3
-        image = image > thr;
+        image = image < thr;
         img = image;
         p = randperm(prod(dimensions(1:2)));
         b = p(1 : uint16(prod(dimensions(1:2)) * variance));
