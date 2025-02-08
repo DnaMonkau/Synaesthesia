@@ -19,12 +19,12 @@ try
     %  1. input pattern
     %  2. neuron layer
     % %  3. astrocyte layer
-    [model.video] = make_video(model.Ca_size_neuros, ...
-        model.V_line, ...
-        model.Iapp_v_full, ...
-        model.T_record_met, model.dimensions);
+    %[model.video] = make_video(model.Ca_size_neuros, ...
+    %    model.V_line, ...
+    %    model.Iapp_v_full, ...
+    %    model.T_record_met, model.dimensions);
 
-    show_video(model.video, struct('limits', [0, 255], 'fps', 30));
+    %show_video(model.video, struct('limits', [0, 255], 'fps', 30));
     
     %% Compute memory performance
     [memory_performance] = ...
@@ -36,8 +36,8 @@ try
         memory_performance.learned_pattern_similarities);
     
     %% Predicted learned images
-    show_video(memory_performance.freq_images); % by frequency
-    show_video(memory_performance.spike_images_best_thr); % with threshold
+    %show_video(memory_performance.freq_images); % by frequency
+    %show_video(memory_performance.spike_images_best_thr); % with threshold
     toc;
     
 catch ME
