@@ -48,7 +48,7 @@ class SimpleSynaesthesiaNet(nn.Module):
       K12 = radius * torch.cos(theta)
       K21 = radius * torch.sin(theta)
 
-      self.K = nn.Parameter(torch.zeros(self.M, self.M) + torch.tensor([K21, K12]), requires_grad=False) # start at 0 fixed point or near 0
+      self.K = nn.Parameter(torch.zeros(self.M, self.M) + torch.tensor([K21, K12]), requires_grad=True) # start at 0 fixed point or near 0
       with torch.no_grad():
         self.K.fill_diagonal_(0) # no self connections
     else:
@@ -138,14 +138,15 @@ class SimpleSynaesthesiaNet(nn.Module):
       self.W1 = nn.Parameter(self.W1.clone() + w_delta1)
       self.W2  = nn.Parameter(self.W2.clone() + w_delta2)
     if self.cross_talk:
-      # k_delta = - self.eta * torch.autograd.grad(torch.stack([E1, E2]), self.K, retain_graph=True)[0]
-      k_delta1  = self.eta * torch.mean(self.s2) * torch.mean(1-2*self.s1)
-      k_delta2 = self.eta * torch.mean(self.s1) * torch.mean(1-2*self.s2)
+      k_delta = - self.eta * torch.autograd.grad(torch.mean(torch.stack([E1, E2])), self.K, retain_graph=True)[0]
+      #k_delta1  = self.eta * torch.mean(self.s2) * torch.mean(1-2*self.s1)
+      #k_delta2 = self.eta * torch.mean(self.s1) * torch.mean(1-2*self.s2)
       with torch.no_grad():
-        # self.K = nn.Parameter(self.K.clone() + k_delta)
-        self.K[0][1] += k_delta1
-        self.K[1][0] += k_delta2
-        self.K.fill_diagonal_(0)
+	#self.K = nn.Parameter(self.K.clone() + k_delta)
+	#self.K[0][1] += k_delta1
+	#self.K[1][0] += k_delta2
+	self.K +=k_delta
+	self.K.fill_diagonal_(0)
     return
 
 
@@ -262,7 +263,7 @@ def run():
   #syn
   syn=[]
   ks = []
-  variances = np.linspace(0.01, 0.25, 4)
+  variances = np.linspace(0.01, 0.25,5)
   # Generate random angles
   theta = 2 * np.pi * torch.rand(1)
 
@@ -295,7 +296,7 @@ def run():
       net.W1 = W1
       net.W2 = W2
       # print(np.shape(x), x)
-      out = net.forward(x,1000)
+      out = net.forward(x,2500)
       if torch.round(abs(net.K[0][1]), decimals=1) < 1.5 and torch.round(abs(net.K[1][0]), decimals=1) < 1.5:
       # if out[-1] == 'Stable':
         plots.append([variances[i], variances[j], 1]) # no cross-talk present
@@ -330,7 +331,7 @@ def make_fig(plots, plots2, plots3):
     plt.scatter(plots2[i][0], plots2[i][1], color = 'red')
   for i in range(len(plots3)):
     plt.scatter(plots3[i][0], plots3[i][1], color = 'orange')    
-  plt.savefig('../Synaesthesia/out.jpeg')
+  plt.savefig('../Synaesthesia/out_2500_ek_5.jpeg')
   # plt.xlim([0, 0.25])
   # plt.ylim([0, 0.25])
   # plt.title()
