@@ -13,8 +13,8 @@ params.n = fix(params.t_end / params.step);
 
 %% Experiment
 params.learn_start_time = 0.5;
-params.learn_impulse_duration = 0.2;
-params.learn_impulse_shift = 0.3;
+params.learn_impulse_duration = 0.1;
+params.learn_impulse_shift = 0.15;
 params.learn_order = [0, 1, 2, 3] + 1;
 
 params.test_start_time = 2.3;
