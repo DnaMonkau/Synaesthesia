@@ -142,11 +142,9 @@ class SimpleSynaesthesiaNet(nn.Module):
       #k_delta1  = self.eta * torch.mean(self.s2) * torch.mean(1-2*self.s1)
       #k_delta2 = self.eta * torch.mean(self.s1) * torch.mean(1-2*self.s2)
       with torch.no_grad():
-	#self.K = nn.Parameter(self.K.clone() + k_delta)
-	#self.K[0][1] += k_delta1
-	#self.K[1][0] += k_delta2
-	self.K +=k_delta
-	self.K.fill_diagonal_(0)
+	      self.K +=k_delta
+	      self.K.fill_diagonal_(0)
+	      #self.K = nn.Parameter(self.K.clone() + k_delta) #self.K[0][1] += k_delta1 #self.K[1][0] += k_delta2
     return
 
 
