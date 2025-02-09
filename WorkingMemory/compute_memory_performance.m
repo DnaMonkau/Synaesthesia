@@ -62,7 +62,8 @@ function similarity = compute_images_similarity(images, spike_images, test_patte
     for k = 1:length(test_patterns)
         estimated_image = spike_images(otherdims{:}, k);
         % disp(sum(images{test_patterns(k)}>0));
-        true_image = images{test_patterns(k)} < 127; % threshold for images  color needs lower threshold and black background
+        % true_image = images{test_patterns(k)} < 127; % threshold for images  color needs lower threshold and black background
+        true_image = images{test_patterns(k)};
         similarity(k) = compute_image_similarity(true_image, estimated_image);
     end
 end

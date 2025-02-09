@@ -35,10 +35,9 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     full_timeline = [learn_timeline; test_timeline];
     full_timeline = fix(full_timeline ./ params.step);
     full_timeline = uint16(full_timeline);
-    
     timeline_signal_id = zeros(1, params.n, 'uint8');
     timeline_signal_id_movie = zeros(1, params.n, 'uint8');
-    
+    disp(full_timeline);
     % Iterate over the full number of samples (learn+test)
     for i = 1 : size(I_signals, length(dimensions)+1)
         be = full_timeline(i, 1);
@@ -60,7 +59,7 @@ function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
     end
     % test shuffle only image dimensions
     if length(dimensions) == 3
-        image = image < thr;
+        % image = image < thr; % check max fow bw vs for color
         img = image;
         p = randperm(prod(dimensions(1:2)));
         b = p(1 : uint16(prod(dimensions(1:2)) * variance));
@@ -74,8 +73,6 @@ function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
         image(b) = ~image(b);
     end
     % shifts pixels around and binary flips images
-  
-    
     
     image = double(image) .* Iapp0; 
 end

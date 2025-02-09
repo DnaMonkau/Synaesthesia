@@ -5,6 +5,8 @@ function [Ca, h, IP3, Iastro_neuron, array_I_neuro] = step_astrocytes(neurons_ac
     diffusion_IP3 = zeros(params.mastro, params.mastro,'double');
     for j = 1 : params.mastro
         for k = 1 : params.nastro
+            disp(neurons_activity(1,1,:) );
+            dk=p;
             if length(dimensions) == 3
                neurons_activity = max(neurons_activity, [], length(dimensions));
             end
