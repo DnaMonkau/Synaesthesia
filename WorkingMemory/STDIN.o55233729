@@ -1,0 +1,49 @@
+----------------------------------------
+Begin PBS Prologue Thu Feb  6 22:16:15 CET 2025 1738876575
+Job ID:		   55233729.dccn-l029.dccn.nl
+Username:	   denmon
+Group:		   artiintel
+Asked resources:   walltime=02:00:00,mem=18gb,neednodes=matlab,ncpus=1
+Queue:		   matlab
+Nodes:		   dccn-c036.dccn.nl
+----------------------------------------
+Limiting memory+swap to 19864223744 bytes ...
+End PBS Prologue Thu Feb  6 22:16:15 CET 2025 1738876575
+----------------------------------------
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2014 The MathWorks, Inc.
+                   R2014b (8.4.0.150421) 64-bit (glnxa64)
+                             September 15, 2014
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+>> 
+params = 
+
+                     t_end: 7
+                      step: 1.0000e-04
+                         n: 70000
+          learn_start_time: 0.5000
+    learn_impulse_duration: 0.2000
+       learn_impulse_shift: 0.3000
+               learn_order: [1 2 3 4]
+           test_start_time: 3.3000
+     test_impulse_duration: 0.1500
+
+----------------------------------------
+Begin PBS Epilogue Thu Feb  6 22:16:38 CET 2025 1738876598
+Job ID:		   55233729.dccn-l029.dccn.nl
+Job Exit Code:     0
+Username:	   denmon
+Group:		   artiintel
+Job Name:	   STDIN
+Session:	   30931
+Asked resources:   walltime=02:00:00,mem=18gb,neednodes=matlab,ncpus=1
+Used resources:	   cput=00:00:07,walltime=00:00:18,mem=568733696b
+Queue:		   matlab
+Nodes:		   dccn-c036.dccn.nl
+End PBS Epilogue Thu Feb  6 22:16:38 CET 2025 1738876598
+----------------------------------------

@@ -1,0 +1,26 @@
+----------------------------------------
+Begin PBS Prologue Fri Feb  7 13:06:41 CET 2025 1738930001
+Job ID:		   55235658.dccn-l029.dccn.nl
+Username:	   denmon
+Group:		   artiintel
+Asked resources:   nodes=1:ppn=1,mem=120gb,walltime=08:00:00,neednodes=1:ppn=1
+Queue:		   batch
+Nodes:		   dccn-c031.dccn.nl
+----------------------------------------
+Limiting memory+swap to 129385889792 bytes ...
+End PBS Prologue Fri Feb  7 13:06:41 CET 2025 1738930001
+----------------------------------------
+----------------------------------------
+Begin PBS Epilogue Fri Feb  7 13:06:46 CET 2025 1738930006
+Job ID:		   55235658.dccn-l029.dccn.nl
+Job Exit Code:     2
+Username:	   denmon
+Group:		   artiintel
+Job Name:	   main.m
+Session:	   31185
+Asked resources:   nodes=1:ppn=1,mem=120gb,walltime=08:00:00,neednodes=1:ppn=1
+Used resources:	   cput=00:00:00,walltime=00:00:00,mem=4714496b
+Queue:		   batch
+Nodes:		   dccn-c031.dccn.nl
+End PBS Epilogue Fri Feb  7 13:06:46 CET 2025 1738930006
+----------------------------------------

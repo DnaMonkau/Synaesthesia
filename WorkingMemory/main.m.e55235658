@@ -1,0 +1,8 @@
+/var/spool/torque/mom_priv/jobs/55235658.dccn-l029.dccn.nl.SC: line 3: try: command not found
+tic: File name needed.  Usage:
+	tic [-e names] [-o dir] [-R name] [-v[n]] [-V] [-w[n]] [-1aCDcfGgIKLNrsTtUx] source-file
+/var/spool/torque/mom_priv/jobs/55235658.dccn-l029.dccn.nl.SC: line 5: fg: no job control
+/var/spool/torque/mom_priv/jobs/55235658.dccn-l029.dccn.nl.SC: line 6: close: command not found
+/var/spool/torque/mom_priv/jobs/55235658.dccn-l029.dccn.nl.SC: line 6: clearvars: command not found
+/var/spool/torque/mom_priv/jobs/55235658.dccn-l029.dccn.nl.SC: line 8: syntax error near unexpected token `42'
+/var/spool/torque/mom_priv/jobs/55235658.dccn-l029.dccn.nl.SC: line 8: `rng(42);'
