@@ -36,8 +36,8 @@ try
         memory_performance.learned_pattern_similarities);
     
     %% Predicted learned images
-    show_video(memory_performance.freq_images); % by frequency
-    show_video(memory_performance.spike_images_best_thr); % with threshold
+    % show_video(memory_performance.freq_images); % by frequency
+    % show_video(memory_performance.spike_images_best_thr); % with threshold
     toc;
     
 catch ME
