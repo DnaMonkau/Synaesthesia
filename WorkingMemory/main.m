@@ -24,7 +24,7 @@ try
     %    model.Iapp_v_full, ...
     %    model.T_record_met, model.dimensions);
 
-    show_video(model.video, struct('limits', [0, 255], 'fps', 30));
+    %show_video(model.video, struct('limits', [0, 255], 'fps', 30));
     
     %% Compute memory performance
     [memory_performance] = ...

@@ -18,7 +18,7 @@ params.learn_impulse_shift = 0.3;
 params.learn_order = [0, 1, 2, 3] + 1;
 
 params.test_start_time = 2.3;
-params.test_impulse_duration = 0.07; 
+params.test_impulse_duration = 0.15; 
 params.test_impulse_shift = 0.4;
 params.test_order = [0, 5, 1, 6, 2, 7, 3, 8] + 1;
 
