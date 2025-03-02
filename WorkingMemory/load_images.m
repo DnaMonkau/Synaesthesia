@@ -80,12 +80,12 @@ function [dimensions, images] = load_images()
         % Synaesthetic input
         image_m = max(image, [], 'all');
         % Iapp_line_zero = Iapp_line - Iapp_line_m;
-        Isynaesthesia = 0.22;
+        Isynaesthesia = 0.18/2;
         % % permeate all of the elements in the current alterbnatively could also
         % 
         % image = image + round(Isynaesthesia * image_m);
         % randomly permeate along a gaussian distribution
-        Prob = reshape(randsample([0, 1], prod(size(image)), true, [0.4, 0.6]), size(image));
+        Prob = reshape(randsample([0, 1], prod(size(image)), true, [0.5-Isynaesthesia, 0.5+Isynaesthesia]), size(image));
         image = double(image) + double(Prob*127);
         images{end + 1} = image;
     end
