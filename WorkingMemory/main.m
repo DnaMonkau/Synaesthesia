@@ -37,7 +37,7 @@ for i = 1:num;
     fprintf(['Memory performance per image: ', fmt, '\n'], ...
         memory_performance.learned_pattern_similarities);
 
-    txt = sprintf('../Downloads/performance%.1f.mat', i);
+    txt = sprintf('Synaesthesia/WorkingMemory/performance%.1f.mat', i);
 
     % save('Synaesthesia/WorkingMemory/performance.mat' )
 
