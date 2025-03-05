@@ -230,38 +230,37 @@ class SimpleSynaesthesiaNet(nn.Module):
     return self.second_logistic_derivative(x)* (1 - 2*self.g(x)) - 2*self.logistic_derivative(x)**2
 
 def run():
-	variances = np.linspace(0.01, 0.25, 27)
-	K= []
-	plots = []
-	plots2 = []
-	W1 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
-	W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
-	outs =[]
-	# net = SimpleSynaesthesiaNet(np.shape(x), 2)
-	for i in range(len(variances)):
-	  for j in range(len(variances)):
-	
-	    n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
-	    n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
-	    x1 = n.sample((1,)).float()[:,0] # modality 1
-	    x2 = n2.sample((1,)).float()[:,0] # modality 2 adjust variances for analysis
-	    x = torch.stack([x1, x2])
-	
-	    net = SimpleSynaesthesiaNet(np.shape(x), 2)
-	    # consistent weights
-	    net.W1 = W1
-	    net.W2 = W2
-	    # print(np.shape(x), x)
-	    out = net.forward(x, max_iter= 10)
-	    if out[-1] == 'Stable':
-	      plots.append([variances[i], variances[j],1])
-	    else:
-	      plots2.append([variances[i], variances[j], 0])
-	    #   print('unstable')
-	    #   print(net.K)
-	    # outs.append(out)
-	    # K.append(net.K)
+  variances = np.linspace(0.01, 0.25, 25)
+  K= []
+  plots = []
+  plots2 = []
+  W1 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
+  W2 = nn.Parameter(torch.randn(1, 1), requires_grad=True)
+  outs =[]
+  # net = SimpleSynaesthesiaNet(np.shape(x), 2)
+  for i in range(len(variances)):
+    for j in range(len(variances)):
 
+      n = tdist.Normal(0, torch.sqrt(torch.tensor([variances[i]])))
+      n2 = tdist.Normal(0, torch.sqrt(torch.tensor([variances[j]])))
+      x1 = n.sample((1,)).float()[:,0] # modality 1
+      x2 = n2.sample((1,)).float()[:,0] # modality 2 adjust variances for analysis
+      x = torch.stack([x1, x2])
+
+      net = SimpleSynaesthesiaNet(np.shape(x), 2)
+      # consistent weights
+      net.W1 = W1
+      net.W2 = W2
+      # print(np.shape(x), x)
+      out = net.forward(x, max_iter= 10)
+      if out[-1] == 'Stable':
+        plots.append([variances[i], variances[j],1])
+      else:
+        plots2.append([variances[i], variances[j], 0])
+      #   print('unstable')
+      #   print(net.K)
+      # outs.append(out)
+      # K.append(net.K)
   return plots, plots2
 def make_fig(plots, plots2):
   for i in range(len(plots)):
