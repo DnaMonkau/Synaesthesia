@@ -111,8 +111,8 @@ function [dimensions, images] = load_images()
         % 
         % image = image + round(Isynaesthesia * image_m);
         % randomly permeate along a gaussian distribution
-        Prob = reshape(randsample([0, 1], prod(size(image)), true, [0.5-Isynaesthesia, 0.5+Isynaesthesia]), size(image));
-        image = double(image) + double(Prob*127);
+        %Prob = reshape(randsample([0, 1], prod(size(image)), true, [0.5-Isynaesthesia, 0.5+Isynaesthesia]), size(image));
+        %image = double(image) + double(Prob*127);
         images{end + 1} = image;
     end
     dimensions = size(image);
