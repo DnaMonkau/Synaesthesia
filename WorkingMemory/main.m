@@ -4,7 +4,7 @@ tic;
 close all; clearvars;
 
 % rng(42);
-num = 10;
+num = 30;
 params = model_parameters(true);
 % disp('Parameters defined');
 
@@ -37,9 +37,9 @@ for i = 1:num;
     fprintf(['Memory performance per image: ', fmt, '\n'], ...
         memory_performance.learned_pattern_similarities);
 
-    txt = sprintf('Synaesthesia/WorkingMemory/performance%.1f.mat', i);
+    txt = sprintf('extended_nonsyn_performance%.1f.mat', i);
 
-    % save('Synaesthesia/WorkingMemory/performance.mat' )
+    % save('performance.mat' )
 
     save(txt)
 

@@ -18,11 +18,11 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     else
         test_order = make_image_order(num_images, 1, true);
     end
-    
+   
     test_signals = make_noise_signals(images, test_order, ...
             dimensions, ...
             params.variance_test, params.Iapp_test);
-    
+   
     I_signals = cat(length(dimensions)+1, learn_signals, test_signals);
     I_signals = uint8(I_signals);
 
@@ -32,12 +32,15 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     test_timeline = make_timeline(params.test_start_time, ...
         params.test_impulse_duration, params.test_impulse_shift, ...
         length(test_order));
+
     full_timeline = [learn_timeline; test_timeline];
     full_timeline = fix(full_timeline ./ params.step);
-    full_timeline = uint16(full_timeline);
+    %full_timeline = uint16(full_timeline);
+	%full_timeline = typecast(full_timeline, 'uint16');
+disp(full_timeline)
     timeline_signal_id = zeros(1, params.n, 'uint8');
     timeline_signal_id_movie = zeros(1, params.n, 'uint8');
-    disp(full_timeline);
+    %disp(full_timeline);
     % Iterate over the full number of samples (learn+test)
     for i = 1 : size(I_signals, length(dimensions)+1)
         be = full_timeline(i, 1);
