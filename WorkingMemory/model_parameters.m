@@ -7,7 +7,7 @@ end
 params = struct;
 
 %% Timeline
-params.t_end = 12;
+params.t_end = 7;
 params.step = 0.0001;
 params.n = fix(params.t_end / params.step);
 
@@ -20,13 +20,13 @@ params.learn_order = [0, 1, 2, 3] + 1;
 params.test_start_time = 2.3;
 params.test_impulse_duration = 0.15; 
 params.test_impulse_shift = 0.4;
-params.test_order = [0, 5, 4, 18, 12, 1, 6,13, 14, 15, 16 2, 7, 17, 11, 19, 20 3, 8, 9, 10, 21] + 1;
+params.test_order = [0, 5, 1, 6, 2, 7, 3, 8] + 1;
 
 %% Applied pattern current 
 params.variance_learn = 0.05;
 params.variance_test = 0.2;% 0.2
-params.Iapp_learn = 80;
-params.Iapp_test = 8;
+params.Iapp_learn = 10;
+params.Iapp_test = 1;
 
 %% Movie
 params.after_sample_frames = 200;
