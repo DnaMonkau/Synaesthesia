@@ -6,7 +6,7 @@ function [Ca, h, IP3, Iastro_neuron, array_I_neuro] = step_astrocytes(neurons_ac
     for j = 1 : params.mastro
         for k = 1 : params.nastro
             if length(dimensions) == 3
-               neurons_activity = max(neurons_activity, [], length(dimensions));
+               neurons_activity = mean(neurons_activity, length(dimensions));
             end
             if neurons_activity(j, k) >= params.min_neurons_activity
                 shift = fix(params.t_neuro / params.step) - 1;

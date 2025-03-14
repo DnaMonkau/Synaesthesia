@@ -25,8 +25,8 @@ params.test_order = [0, 5, 11, 4, 10, 1, 9, 6, 2, 20, 7, 3, 8] + 1;
 %% Applied pattern current 
 params.variance_learn = 0.05;
 params.variance_test = 0.2;% 0.2
-params.Iapp_learn = 10;
-params.Iapp_test = 1;
+params.Iapp_learn = 80;
+params.Iapp_test = 8;
 
 %% Movie
 params.after_sample_frames = 200;

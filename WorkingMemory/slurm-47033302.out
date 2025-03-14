@@ -1,0 +1,14 @@
+----------------------------------------
+Start job epilogue Fri Mar 14 20:31:10 CET 2025
+----------------------------------------
+Job ID:          47033302
+Job Exit Code:   0:0
+Username:        denmon
+Group:           artiintel
+Queue:           batch
+Compute nodes:   dccn-c088
+Asked resources: walltime=1-06:00:00,nodes=1,cpus=1,mem=120G
+Used resources:  cputime=19:25:00,walltime=19:25:00,memory=30G
+----------------------------------------
+End job epilogue Fri Mar 14 20:31:10 CET 2025
+----------------------------------------
