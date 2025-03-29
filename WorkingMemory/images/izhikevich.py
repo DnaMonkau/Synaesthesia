@@ -635,7 +635,7 @@ def train(Izhikevich=True):
           'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
           'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
       ]
-  for file in os.listdir():
+  for file in os.listdir(path):
     if file in bw:
       for j in range(3):
         img = cv2.imread(path + file)
