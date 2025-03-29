@@ -673,5 +673,5 @@ def train(Izhikevich=True):
       print('Synaesthetic Baseline:', Isynaesthesia)
       i+=1
   return Isynaesthesias
-Isynaesthesias = train(True)
+Isynaesthesias = train(False)
 torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
