@@ -662,7 +662,7 @@ def train(Izhikevich=True):
         E_Network.forward(simulation_emergence_data, max_iter = emergence_iterations)
         print('Finalised synaesthetic simulations')
         # non syn
-        E_Network_non = GraphemeColourSynaesthesiaNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
+        E_Network_non = GraphemeColourSynaesthesiaNet(np.shape(simulation_emergence_data), M=len(x1)*2)
         E_Network_non.W = weights1
         E_Network_non.cross_talk = False
         E_Network_non.forward(simulation_emergence_data, max_iter = emergence_iterations)
