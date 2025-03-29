@@ -675,5 +675,5 @@ def train(Izhikevich=True):
       i+=1
   Isynaesthesias = torch.tensor(Isynaesthesias)
   return Isynaesthesias
-Isynaesthesias = train(False)
+Isynaesthesias = train(True)
 torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
