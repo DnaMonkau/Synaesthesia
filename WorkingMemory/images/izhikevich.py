@@ -684,4 +684,5 @@ def train(Izhikevich=True):
       i+=1
   return Isynaesthesias
 Isynaesthesias = train(True)
-torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
+torch.save(Isynaesthesias, 'Izhikevich_true_number_color_Synaesthesia.pt')
+
