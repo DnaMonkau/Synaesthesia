@@ -674,13 +674,13 @@ def train(Izhikevich=True):
         # Calculate Synaesthetic Baseline
         Synaesthesia_s = torch.stack([E_Network.s1, E_Network_non.s1])
         Non_Synaesthesia_s = torch.stack([E_Network.s2, E_Network_non.s2])
-
+        del E_network_non, E_network
         Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
 
         Isynaesthesias.append(Isynaesthesia.detach().numpy())
         print('Synaesthetic Baseline:', Isynaesthesia)
         convergences.append([convergence, convergence_n])
-        del E_network, E_network_non, Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
+        del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
       i+=1
   return Isynaesthesias
 Isynaesthesias = train(True)
