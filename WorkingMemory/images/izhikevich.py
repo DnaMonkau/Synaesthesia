@@ -612,8 +612,7 @@ class GraphemeColourSynaesthesiaSpikeNet(nn.Module):
     return self.second_logistic_derivative(x)* (1 - 2*self.g(x)) - 2*self.logistic_derivative(x)**2
 ### Simulation
 def train(Izhikevich=True):
-  img = cv2.imread('zero.jpg')
-  img = cv2.resize(img, (0,0), fx=0.06, fy=0.06)
+  img = cv2.resize('zero.jpg', (0,0), fx=0.06, fy=0.06)
 
   x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten()<127).astype('float32'))
   # colour category per pixel 0=original  blue=green
@@ -633,8 +632,7 @@ def train(Izhikevich=True):
       ]
   for file in os.listdir():
     if file in bw:
-      img = cv2.imread(file)
-      img = cv2.resize(img, (0,0), fx=0.06, fy=0.06)
+      img = cv2.resize(file, (0,0), fx=0.06, fy=0.06)
       x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten()<127).astype('float32'))
       # colour category per pixel 0=original  blue=green
       x2 = torch.from_numpy(np.random.choice([0, 1, 2, 3], size = len(x1)).astype('float32'))
