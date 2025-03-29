@@ -614,7 +614,8 @@ class GraphemeColourSynaesthesiaSpikeNet(nn.Module):
 # flat gray scale number array
 
 def train(Izhikevich=True):
-  img = cv2.imread('zero.jpg')
+  path = 'WorkingMemory/images/'
+  img = cv2.imread(path+'zero.jpg')
   img = cv2.resize(img, (0,0), fx=0.06, fy=0.06)
 
   x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten()<127).astype('float32'))
@@ -626,7 +627,7 @@ def train(Izhikevich=True):
   E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
   #syn
   weights1 = E_Network.W
-  emergence_iterations=20
+  emergence_iterations = 30
   Isynaesthesias = []
   convergences = []
   i = 0
@@ -637,7 +638,7 @@ def train(Izhikevich=True):
   for file in os.listdir():
     if file in bw:
       for i in range(3):
-        img = cv2.imread(file)
+        img = cv2.imread(path + file)
         img = cv2.resize(img, (0,0), fx=0.06, fy=0.06)
         x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten()<127).astype('float32'))
         # colour category per pixel 0=original  blue=green
