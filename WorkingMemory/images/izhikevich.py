@@ -268,7 +268,7 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     self.critical_etas = torch.tensor(torch.zeros(int((max_iter)/self.time_step)))
     x = x.flatten()
     self.x =x
-    sample_ts = torch.linspace(0., int((max_iter)/self.time_step), int(max_iter/self.time_step))
+    samp_ts = torch.linspace(0., int((max_iter)/self.time_step), int(max_iter/self.time_step))
     converged = []
     s1_prev, s2_prev = -np.inf, -np.inf
 
