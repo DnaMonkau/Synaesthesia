@@ -673,7 +673,7 @@ def train(Izhikevich=True):
       Isynaesthesias.append(Isynaesthesia.detach().numpy())
       print('Synaesthetic Baseline:', Isynaesthesia)
       i+=1
-  Isynaesthesias = torch.tensor(Isynaesthesias)
+  Isynaesthesias = torch.tensor(np.array(Isynaesthesias))
   return Isynaesthesias
 Isynaesthesias = train(True)
-torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
+torch.save(Isynaesthesias, 'Izhikevich_real_number_color_Synaesthesia.pt')
