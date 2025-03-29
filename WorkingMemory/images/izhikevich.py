@@ -623,7 +623,7 @@ def train(Izhikevich=True):
   E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
   #syn
   weights1 = E_Network.W
-  emergence_iterations=20
+  emergence_iterations=30
   Isynaesthesias = torch.zeros(10)
   i = 0
   bw = image_names = [
