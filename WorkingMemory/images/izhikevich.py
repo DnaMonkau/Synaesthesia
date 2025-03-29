@@ -284,7 +284,6 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
         if (abs(self.K) <= 1).all():
           status.append('Stable')
           s1, s2 = self.steady_state(x, s1, s2)
-          spiked, fired = self.Izhikevich_neurons.step(s1, s2, self.time_step)
         else:
           status.append('Unstable')
 
@@ -307,7 +306,6 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
 
       self.variances[i,0] = torch.mean(self.s1**2) - torch.mean(self.s1)**2
       self.variances[i,1] = torch.mean(self.s2**2) - torch.mean(self.s2)**2
-      self.critical_etas[i] = self.critical_eta
      # self.critical_etas[i] = self.critical_eta
       s1_prev, s2_prev = s1.clone(), s2.clone()
       with torch.no_grad():
