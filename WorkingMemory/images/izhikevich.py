@@ -637,7 +637,7 @@ def train(Izhikevich=True):
       ]
   for file in os.listdir():
     if file in bw:
-      for i in range(3):
+      for j in range(3):
         img = cv2.imread(path + file)
         img = cv2.resize(img, (0,0), fx=0.06, fy=0.06)
         x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten()<127).astype('float32'))
