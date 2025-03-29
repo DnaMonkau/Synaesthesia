@@ -624,7 +624,7 @@ def train(Izhikevich=True):
   #syn
   weights1 = E_Network.W
   emergence_iterations=30
-  Isynaesthesias = torch.zeros(10)
+  Isynaesthesias = []
   i = 0
   bw = image_names = [
           'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
@@ -670,9 +670,10 @@ def train(Izhikevich=True):
       Non_Synaesthesia_s = torch.stack([E_Network.s2, E_Network_non.s2])
 
       Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
-      Isynaesthesias[i] = Isynaesthesia.detach().numpy()
+      Isynaesthesias.append(Isynaesthesia.detach().numpy())
       print('Synaesthetic Baseline:', Isynaesthesia)
       i+=1
+  Isynaesthesias = torch.tensor(Isynaesthesias)
   return Isynaesthesias
 Isynaesthesias = train(False)
 torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
