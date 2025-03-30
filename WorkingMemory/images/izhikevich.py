@@ -17,6 +17,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 import numpy as np
 from torch.distributions import categorical as tdistc
 from torch.distributions import bernoulli as tdistb
+import gc
 
 def model_parameters():
 
@@ -746,8 +747,8 @@ def faux_train(Izhikevich=True):
       print('Synaesthetic Baseline:', Isynaesthesia)
       convergence.append([convergence, convergence_n])
       del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
-      
+      gc.collect()
   return Isynaesthesias, convergence
 Isynaesthesias, convergence= faux_train(True)
 print(convergence)
-torch.save(Isynaesthesias, 'Izhikevich_grapheme_color_Synaesthesia.pt')
+torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
