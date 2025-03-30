@@ -750,4 +750,4 @@ def faux_train(Izhikevich=True):
   return Isynaesthesias, convergence
 Isynaesthesias, convergence= faux_train(True)
 print(convergence)
-torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
+torch.save(Isynaesthesias, 'Izhikevich_grapheme_color_Synaesthesia.pt')
