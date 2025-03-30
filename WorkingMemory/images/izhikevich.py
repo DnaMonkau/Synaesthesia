@@ -15,7 +15,8 @@ from torchdiffeq import odeint
 import cv2
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 import numpy as np
-
+from torch.distributions import categorical as tdistc
+from torch.distributions import bernoulli as tdistb
 
 def model_parameters():
 
@@ -614,8 +615,7 @@ class GraphemeColourSynaesthesiaSpikeNet(nn.Module):
 # flat gray scale number array
 
 def train(Izhikevich=True):
-  path = 'WorkingMemory/images/'
-  img = cv2.imread(path+'zero.jpg')
+  img = cv2.imread('zero.jpg')
   img = cv2.resize(img, (0,0), fx=0.06, fy=0.06)
 
   x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten()<127).astype('float32'))
@@ -627,7 +627,7 @@ def train(Izhikevich=True):
   E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
   #syn
   weights1 = E_Network.W
-  emergence_iterations = 30
+  emergence_iterations=20
   Isynaesthesias = []
   convergences = []
   i = 0
@@ -635,10 +635,10 @@ def train(Izhikevich=True):
           'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
           'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
       ]
-  for file in os.listdir(path):
+  for file in os.listdir():
     if file in bw:
-      for j in range(3):
-        img = cv2.imread(path + file)
+      for i in range(3):
+        img = cv2.imread(file)
         img = cv2.resize(img, (0,0), fx=0.06, fy=0.06)
         x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).flatten()<127).astype('float32'))
         # colour category per pixel 0=original  blue=green
@@ -674,15 +674,80 @@ def train(Izhikevich=True):
         # Calculate Synaesthetic Baseline
         Synaesthesia_s = torch.stack([E_Network.s1, E_Network_non.s1])
         Non_Synaesthesia_s = torch.stack([E_Network.s2, E_Network_non.s2])
-        del E_network_non, E_network
+
         Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
 
         Isynaesthesias.append(Isynaesthesia.detach().numpy())
         print('Synaesthetic Baseline:', Isynaesthesia)
         convergences.append([convergence, convergence_n])
-        del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
+        del E_network, E_network_non, Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
       i+=1
   return Isynaesthesias
-Isynaesthesias = train(True)
-torch.save(Isynaesthesias, 'Izhikevich_true_number_color_Synaesthesia.pt')
+def faux_train(Izhikevich=True):
+  
+  n = tdistb.Bernoulli(torch.tensor([0.3]))
+  x1 = n.sample((9,)).float()[:,0]# modality 2 black or white
 
+  n2 = tdistc.Categorical(torch.tensor([ 0.25, 0.25, 0.25, 0.25 ]))
+  x2 = n2.sample((9,)).float()# modality 1  range of colours
+  x2[x1==0] = 0
+  simulation_emergence_data = torch.stack([x1, x2])
+  print(np.shape(simulation_emergence_data))
+  E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
+  #syn
+  weights1 = E_Network.W
+  emergence_iterations=20
+  Isynaesthesias = []
+  convergences = []
+  
+  for i in range(10):
+    n = tdistb.Bernoulli(torch.tensor([0.3]))
+    x1 = n.sample((9,)).float()[:,0]# modality 2 black or white
+
+    n2 = tdistc.Categorical(torch.tensor([ 0.25, 0.25, 0.25, 0.25 ]))
+    x2 = n2.sample((9,)).float()# modality 1  range of colours
+    x2[x1==0] = 0
+    simulation_emergence_data = torch.stack([x1, x2]) 
+    for j in range(3):
+      if (i * j) % 10 == 0:
+        print('iter', i * j)
+      #syn
+      if Izhikevich:
+        E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
+
+        E_Network.W = weights1
+        status, convergence = E_Network.forward(simulation_emergence_data, max_iter = emergence_iterations)
+        print('Finalised synaesthetic simulations')
+        # non syn
+        E_Network_non = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
+        E_Network_non.W = weights1
+        E_Network_non.cross_talk = False
+        status_n, convergence_n = E_Network_non.forward(simulation_emergence_data, max_iter = emergence_iterations)
+        print('Finalised non-synaesthetic simulations')
+      else:
+        E_Network = GraphemeColourSynaesthesiaNet(np.shape(simulation_emergence_data), M=len(x1)*2)
+
+        E_Network.W = weights1
+        status, convergence = E_Network.forward(simulation_emergence_data, max_iter = emergence_iterations)
+        print('Finalised synaesthetic simulations')
+        # non syn
+        E_Network_non = GraphemeColourSynaesthesiaNet(np.shape(simulation_emergence_data), M=len(x1)*2)
+        E_Network_non.W = weights1
+        E_Network_non.cross_talk = False
+        status_n, convergence_n = E_Network_non.forward(simulation_emergence_data, max_iter = emergence_iterations)
+        print('Finalised non-synaesthetic simulations')
+      # Calculate Synaesthetic Baseline
+      Synaesthesia_s = torch.stack([E_Network.s1, E_Network_non.s1])
+      Non_Synaesthesia_s = torch.stack([E_Network.s2, E_Network_non.s2])
+
+      Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
+
+      Isynaesthesias.append(Isynaesthesia.detach().numpy())
+      print('Synaesthetic Baseline:', Isynaesthesia)
+      convergence.append([convergence, convergence_n])
+      del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
+      
+  return Isynaesthesias, convergence
+Isynaesthesias, convergence= faux_train(True)
+print(convergence)
+torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
