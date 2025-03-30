@@ -764,9 +764,10 @@ def faux_train(Izhikevich=True):
       # print('Synaesthetic Baseline:')
       convergence.append([convergence, convergence_n])
       # del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
-      
+      torch.load()
   return Isynaesthesias, convergence
-Isynaesthesias_n = train(True)
 
 Isynaesthesias, convergence= faux_train(True)
+torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
+
 print(convergence)
