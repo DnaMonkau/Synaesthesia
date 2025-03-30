@@ -699,7 +699,6 @@ def train(Izhikevich=True):
       i+=1
   return Isynaesthesias
 def faux_train(Izhikevich=True):
-  # flat gray scale number array  
   n = tdistb.Bernoulli(torch.tensor([0.3]))
   x1 = n.sample((9,)).float()[:,0]# modality 2 black or white
 
@@ -708,7 +707,11 @@ def faux_train(Izhikevich=True):
   x2[x1==0] = 0
   simulation_emergence_data = torch.stack([x1, x2])
   print(np.shape(simulation_emergence_data))
-  E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
+  if Izhikevich:
+    E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
+  else:
+    E_Network = GraphemeColourSynaesthesiaNet( np.shape(simulation_emergence_data), M=len(x1)*2)
+
   #syn
   weights1 = E_Network.W
   emergence_iterations=60
@@ -752,21 +755,24 @@ def faux_train(Izhikevich=True):
         status_n, convergence_n = E_Network_non.forward(simulation_emergence_data, max_iter = emergence_iterations)
         print('Finalised non-synaesthetic simulations')
       # Calculate Synaesthetic Baseline
-      # s1 = torch.stack([E_Network.s1, E_Network_non.s1])
-      # s2 = torch.stack([E_Network.s2, E_Network_non.s2])
-      Synaesthesia_v = E_Network.spikes
-      Non_Synaesthesia_v = E_Network_non.spikes
-      # Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
+      s1 = torch.stack([E_Network.s1, E_Network_non.s1])
+      s2 = torch.stack([E_Network.s2, E_Network_non.s2])
+      # Synaesthesia_v = E_Network.spikes
+      # Non_Synaesthesia_v = E_Network_non.spikes
+      Isynaesthesia = torch.mean(abs(s1 -  s2), 0).mean()  # synaesthesia output current I
 
-      Isynaesthesia = torch.mean(Synaesthesia_v -  Non_Synaesthesia_v, 0).mean()  # synaesthesia output current I
+      # Isynaesthesia = torch.mean(Synaesthesia_v -  Non_Synaesthesia_v, 0).mean()  # synaesthesia output current I
       
       Isynaesthesias.append(Isynaesthesia.detach().numpy())
       # print('Synaesthetic Baseline:')
       convergence.append([convergence, convergence_n])
       # del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
+      
   return Isynaesthesias, convergence
+Isynaesthesias_n = train(False)
 
-Isynaesthesias, convergence= faux_train(True)
-torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
+
+Isynaesthesias, convergence= faux_train(False)
+torch.save(Isynaesthesias, 'Standard_number_color_Synaesthesia.pt')
 
 print(convergence)
