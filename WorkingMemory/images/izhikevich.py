@@ -355,26 +355,40 @@ class IzhikevichNeuron():
     #     d = params['d']
     # else:
     #     return 'Neuron type must be excitatory or inhibitory'
-    self.v = torch.full((M, N), self.a)  # Membrane potential
-    self.u = torch.full((M, N), self.b * self.c ) # Recovery variable
+    self.v = torch.full((N, M), self.a) # Membrane potential
+    self.u = torch.full((N, M), self.b * self.c ) # Recovery variable
   def step(self, I1, I2, time_step):
     I = torch.stack([I1, I2]).flatten()
-    # when the neuron fired
-    fired = torch.where(self.v >= params['neuron_fired_thr'], 1, 0)
-    for v in range(len(self.v)):
-      for u in range(len(self.v[0])):
-        if (self.v[v][u] >= params['neuron_fired_thr']):
-            self.v[v][u] = self.c
-            self.u[v][u] += self.d
+    # I = I.view(*self.v.shape)  # Reshape I to match v's dimensions
+    # I = torch.repeat_interleave(I, self.v.size(dim=1), axis=0)
+    # Find neurons that fired
+    # Update fired neurons
+    # fired = fired_mask = torch.where(self.v >= params['neuron_fired_thr'], 1, 0)
 
-        else:
-            # # solve using Euler using current of both modalities
-            # print('eukler', self.v)
-            dv =  0.04 * self.v[v][u]**2 + 5 * self.v[v][u] + 140 - self.u[v][u] + I[v]
-            du = self.a * (self.b * self.v[v][u] - self.u[v][u])
-            self.v[v][u] = self.v[v][u] + dv * time_step
-            self.u[v][u] = self.u[v][u] + du * time_step
-
+    n_substeps = 1
+    dt = time_step / n_substeps
+    I = torch.stack([I1, I2]).flatten()
+    
+    fired = torch.zeros_like(self.v, dtype=torch.int)
+    
+    # Break the timestep into smaller steps for stability
+    for _ in range(n_substeps):
+      # Identify neurons currently above threshold
+      fired_now = self.v >= params['neuron_fired_thr']
+      fired = torch.logical_or(fired, fired_now)  # Track any firing during the full timestep
+      
+      # Reset neurons that just fired
+      self.v[fired_now] = self.c
+      self.u[fired_now] = self.u[fired_now] + self.d
+      
+      # Compute updates for all neurons
+      dv = 0.04 * self.v**2 + 5 * self.v + 140 - self.u + I
+      du = self.a * (self.b * self.v - self.u)
+      
+      # Apply updates only to neurons below threshold
+      not_fired_now = ~fired_now
+      self.v[not_fired_now] += dv[not_fired_now] * dt
+      self.u[not_fired_now] += du[not_fired_now] * dt
             # # solve using RK 4th order
 
             # dv1 = time_step * dvdt(v_aux, u_aux, I_aux)
@@ -685,7 +699,7 @@ def train(Izhikevich=True):
       i+=1
   return Isynaesthesias
 def faux_train(Izhikevich=True):
-  
+  # flat gray scale number array  
   n = tdistb.Bernoulli(torch.tensor([0.3]))
   x1 = n.sample((9,)).float()[:,0]# modality 2 black or white
 
@@ -697,7 +711,7 @@ def faux_train(Izhikevich=True):
   E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
   #syn
   weights1 = E_Network.W
-  emergence_iterations=20
+  emergence_iterations=60
   Isynaesthesias = []
   convergences = []
   
@@ -710,8 +724,8 @@ def faux_train(Izhikevich=True):
     x2[x1==0] = 0
     simulation_emergence_data = torch.stack([x1, x2]) 
     for j in range(3):
-      if (i * j) % 10 == 0:
-        print('iter', i * j)
+      if j==0:
+        print('iter', i)
       #syn
       if Izhikevich:
         E_Network = GraphemeColourSynaesthesiaSpikeNet(params, np.shape(simulation_emergence_data), M=len(x1)*2)
@@ -738,17 +752,21 @@ def faux_train(Izhikevich=True):
         status_n, convergence_n = E_Network_non.forward(simulation_emergence_data, max_iter = emergence_iterations)
         print('Finalised non-synaesthetic simulations')
       # Calculate Synaesthetic Baseline
-      Synaesthesia_s = torch.stack([E_Network.s1, E_Network_non.s1])
-      Non_Synaesthesia_s = torch.stack([E_Network.s2, E_Network_non.s2])
+      # s1 = torch.stack([E_Network.s1, E_Network_non.s1])
+      # s2 = torch.stack([E_Network.s2, E_Network_non.s2])
+      Synaesthesia_v = E_Network.spikes
+      Non_Synaesthesia_v = E_Network_non.spikes
+      # Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
 
-      Isynaesthesia = torch.mean(abs(Synaesthesia_s -  Non_Synaesthesia_s), 0).mean()  # synaesthesia output current I
-
+      Isynaesthesia = torch.mean(Synaesthesia_v -  Non_Synaesthesia_v, 0).mean()  # synaesthesia output current I
+      
       Isynaesthesias.append(Isynaesthesia.detach().numpy())
-      print('Synaesthetic Baseline:', Isynaesthesia)
+      # print('Synaesthetic Baseline:')
       convergence.append([convergence, convergence_n])
-      del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
-      gc.collect()
+      # del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
+      
   return Isynaesthesias, convergence
+Isynaesthesias_n = train(True)
+
 Isynaesthesias, convergence= faux_train(True)
 print(convergence)
-torch.save(Isynaesthesias, 'Izhikevich_number_color_Synaesthesia.pt')
