@@ -270,13 +270,13 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     self.critical_etas = torch.tensor(torch.zeros(int((max_iter)/self.time_step)))
     x = x.flatten()
     self.x =x
-    sample_ts = torch.linspace(0., int((max_iter)/self.time_step), int(max_iter/self.time_step))
+    samp_ts = torch.linspace(0., int((max_iter)/self.time_step), int(max_iter/self.time_step))
     converged = []
     s1_prev, s2_prev = -np.inf, -np.inf
 
 
     for i in tqdm(range(1,int((max_iter/self.time_step)))):
-     
+
 
       with torch.no_grad():
         s1 = self.s1.clone()
@@ -286,7 +286,6 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
         if (abs(self.K) <= 1).all():
           status.append('Stable')
           s1, s2 = self.steady_state(x, s1, s2)
-          spiked, fired = self.Izhikevich_neurons.step(s1, s2, self.time_step)
         else:
           status.append('Unstable')
 
@@ -309,16 +308,15 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
 
       self.variances[i,0] = torch.mean(self.s1**2) - torch.mean(self.s1)**2
       self.variances[i,1] = torch.mean(self.s2**2) - torch.mean(self.s2)**2
-      self.critical_etas[i] = self.critical_eta
      # self.critical_etas[i] = self.critical_eta
       s1_prev, s2_prev = s1.clone(), s2.clone()
       with torch.no_grad():
         self.K.fill_diagonal_(0)
-    # if len(converged) != 0:
-    #   print('\n --- \n Converged at iteration: ', converged[0], '\n --- \n')
-    #   # print('\n --- \n Diverged or reached max iterations after at iteration: ', converged[-1], '\n --- \n')
-    # else:
-    #   print('\n --- Did not converge \n ---\n ')
+    if len(converged) != 0:
+      print('\n --- \n Converged at iteration: ', converged[0], '\n --- \n')
+      # print('\n --- \n Diverged or reached max iterations after at iteration: ', converged[-1], '\n --- \n')
+    else:
+      print('\n --- Did not converge \n ---\n ')
     return status, converged
 
   def predict(self, x, s):
@@ -769,6 +767,7 @@ def faux_train(Izhikevich=True):
       # del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
       
   return Isynaesthesias, convergence
+Isynaesthesias_n = train(False)
 
 
 Isynaesthesias, convergence= faux_train(False)
