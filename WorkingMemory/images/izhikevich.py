@@ -769,7 +769,6 @@ def faux_train(Izhikevich=True):
       # del Synaesthesia_s, Non_Synaesthesia_s, convergence, convergence_n
       
   return Isynaesthesias, convergence
-Isynaesthesias_n = train(False)
 
 
 Isynaesthesias, convergence= faux_train(False)
