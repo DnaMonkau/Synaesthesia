@@ -13,21 +13,23 @@ function [V, U, G, Isyn, mask,Iapp] = step_neurons(V, U, G, t_Iapp_met, array_Ia
     end
     
     %% Izhikevich neuron model
+    
     Iapp_line = Iapp(:);
     Iapp_line = double(Iapp_line);
     fired = find(V >= params.neuron_fired_thr);
     V(fired) = params.c;
     U(fired) = U(fired) + params.d;
-    
+    % basically leads to no calcium distinction because there is no
+    % distinct firing pattern
     I_sum = Iapp_line + Isyn + I_poisson_noise;
     I_sum = min(I_sum, params.I_input_thr);
     V = V + params.step .* 1000 .* (0.04 .* V .^ 2 + 5 .* V + 140 + I_sum - U);
     U = U + params.step .* 1000 .* params.aa .* (params.b .* V - U);
     V = min(V, params.neuron_fired_thr);
-    
+
     %% Glutamate (neurotransmitter model)
     del = zeros(params.quantity_neurons,1);
-    del(V == params.neuron_fired_thr) = 1;
+    del(V >= params.neuron_fired_thr) = 1;
     % disp(size(G - params.step))
     G = G - params.step .* (params.alf .* G - params.k  .* del);
     

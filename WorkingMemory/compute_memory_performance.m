@@ -1,7 +1,6 @@
 function [performance] = compute_memory_performance(images, V_line, T_Iapp, dimensions)
     params = model_parameters();
     params.quantity_neurons = prod(dimensions);
-    % otherdims =repmat({':'},1, length(model.dimensions));
     num_learn_patterns = length(params.learn_order);
     pattern_shift = num_learn_patterns;
     
@@ -45,15 +44,17 @@ function [performance] = compute_memory_performance(images, V_line, T_Iapp, dime
             learned_patterns, dimensions);
 end
 
-function similarity = compute_image_similarity(true_image, estimated_image)
+function similarity = compute_image_similarity(true_image, estimated_image, dimensions)
+    otherdims = repmat({':'},1, length(dimensions));
+    pattern_mask = true_image(otherdims{:}) <127;
+    % background_mask = true_image(otherdims{:}) >=127;
     
-    pattern_mask = true_image == 1;
-    background_mask = true_image == 0;
-    n_pattern = sum(pattern_mask, 'all');
-    n_background = sum(background_mask, 'all');
-    n_true_pattern = sum(true_image(pattern_mask) == estimated_image(pattern_mask));
-    n_true_background = sum(true_image(background_mask) == estimated_image(background_mask));
-    similarity = (n_true_background / n_background + n_true_pattern / n_pattern) / 2;
+    % n_pattern = sum(pattern_mask, 'all');
+    % n_background = sum(background_mask, 'all');
+    n_true_pattern = sum(pattern_mask == ~estimated_image, 'all');
+    % n_true_background = sum(sum(background_mask == estimated_image, 'all');
+    % similarity = (n_true_background / n_background + n_true_pattern / n_pattern) / 2;
+    similarity = (n_true_pattern) / prod(dimensions);
 end
 
 function similarity = compute_images_similarity(images, spike_images, test_patterns, dimensions)
@@ -62,8 +63,11 @@ function similarity = compute_images_similarity(images, spike_images, test_patte
     for k = 1:length(test_patterns)
         estimated_image = spike_images(otherdims{:}, k);
         % disp(sum(images{test_patterns(k)}>0));
-        % true_image = images{test_patterns(k)} < 127; % threshold for images  color needs lower threshold and black background
-        true_image = images{test_patterns(k)};
-        similarity(k) = compute_image_similarity(true_image, estimated_image);
+        if (length(dimensions) == 2)
+            true_image = images{test_patterns(k)}; % threshold for images  color needs lower threshold and black background
+        else
+            true_image = images{test_patterns(k)};
+        end
+        similarity(k) = compute_image_similarity(true_image, estimated_image, dimensions);
     end
 end

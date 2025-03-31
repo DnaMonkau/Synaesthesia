@@ -1,5 +1,5 @@
 function [dimensions, images] = load_images()
-    images_dir = 'images/';
+    images_dir = 'images\';
     image_names = {
         'zero.jpg', ...
         'one.jpg', ...
@@ -104,17 +104,16 @@ function [dimensions, images] = load_images()
         image = imread(fullfile(images_dir, name{1}));        
         % image = rgb2gray(image);
         % Synaesthetic input
-        image_m = max(image, [], 'all');
-        % Iapp_line_zero = Iapp_line - Iapp_line_m;
-        Isynaesthesia = 0.18/2;
+        Isynaesthesia = 0.08;
         % % permeate all of the elements in the current alterbnatively could also
         % 
         % image = image + round(Isynaesthesia * image_m);
         % randomly permeate along a gaussian distribution
-       	%Prob = reshape(randsample([0, 1], prod(size(image)), true, [0.5-Isynaesthesia, 0.5+Isynaesthesia]), size(image));
-        %image = double(image) + double((Prob*127).*(image<127));
+       	Prob = reshape(randsample([0, 1], prod(size(image)), true, [0.5-Isynaesthesia, 0.5+Isynaesthesia]), size(image));
+        image = double(image) + double((Prob*127).*(image<127));
         images{end + 1} = image;
     end
     dimensions = size(image);
-    disp(dimensions)
+    disp(dimensions);
 end
+ 

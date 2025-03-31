@@ -5,8 +5,9 @@ function [Ca, h, IP3, Iastro_neuron, array_I_neuro] = step_astrocytes(neurons_ac
     diffusion_IP3 = zeros(params.mastro, params.mastro,'double');
     for j = 1 : params.mastro
         for k = 1 : params.nastro
+            % disp(neurons_activity(18:22,18:22));
             if length(dimensions) == 3
-               neurons_activity = mean(neurons_activity, length(dimensions));
+               neurons_activity = max(neurons_activity, length(dimensions));
             end
             if neurons_activity(j, k) >= params.min_neurons_activity
                 shift = fix(params.t_neuro / params.step) - 1;
@@ -56,18 +57,24 @@ function [Ca, h, IP3, Iastro_neuron, array_I_neuro] = step_astrocytes(neurons_ac
             h(j, k) = X(2);
             IP3(j, k) = X(3);
             
-            %% Astrocyte event occurs and impact on connected neurons
+            %% Astrocyte event occurs and impact on connected neurons (check for hinderance in rgb)
             bnh = rem(i, params.shift_window_astro_watch);
-            if (Ca(j, k) > params.threshold_Ca) && (bnh == 0)
+     
                 if length(dimensions) == 2
-                    Fin = any(spike(j, k, (i - params.window_astro_watch) : i) >= params.enter_astro);
+                    if (Ca(j, k) > params.threshold_Ca) && (bnh == 0)
+                        Fin = any(spike(j, k, (i - params.window_astro_watch) : i) >= params.enter_astro);
+                        if Fin > 0
+                            Iastro_neuron(j, k, i : i + params.impact_astro) = 1;
+                        end
+                    end
                 else
-                    Fin = any(spike(j, k, :, (i - params.window_astro_watch) : i) >= params.enter_astro);
-                end
-                if Fin > 0
-                    Iastro_neuron(j, k, i : i + params.impact_astro) = 1;
+                    if (Ca(j, k) > params.threshold_Ca) && (bnh == 0)
+                        Fin = any(spike(j, k, :, (i - params.window_astro_watch) : i) >= params.enter_astro);
+                        if Fin > 0
+                            Iastro_neuron(j, k, i : i + params.impact_astro) = 1;
+                        end
+                    end
                 end
             end
         end
-    end
 end

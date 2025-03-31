@@ -1,4 +1,3 @@
-
 tic;
 %% Initialization
 close all; clearvars;
@@ -48,8 +47,8 @@ for i = 1:num;
     % show_video(memory_performance.spike_images_best_thr); % with threshold
     clear model memory_performance;
 
-  end
-  toc;
+ end
+ toc;
 % catch ME
 %     if (strcmp(ME.identifier,'MATLAB:nomem'))
 %         error('Out of memory. Please, increase the amount of available memory. \nThe minimum required amount of RAM is 16 GB.', 0);

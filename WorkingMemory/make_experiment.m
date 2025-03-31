@@ -6,7 +6,7 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     if isfield(params, 'learn_order')
         learn_order = params.learn_order;
     else
-        learn_order = make_image_order(num_images, 10, true); 
+        learn_order = make_image_order(num_images, 10, false); 
     end
     
     learn_signals = make_noise_signals(images, learn_order, ...
@@ -16,13 +16,13 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     if isfield(params, 'test_order')
         test_order = params.test_order;
     else
-        test_order = make_image_order(num_images, 1, true);
+        test_order = make_image_order(num_images, 1, false);
     end
-   
+    
     test_signals = make_noise_signals(images, test_order, ...
             dimensions, ...
             params.variance_test, params.Iapp_test);
-   
+    
     I_signals = cat(length(dimensions)+1, learn_signals, test_signals);
     I_signals = uint8(I_signals);
 
@@ -32,15 +32,13 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     test_timeline = make_timeline(params.test_start_time, ...
         params.test_impulse_duration, params.test_impulse_shift, ...
         length(test_order));
-
     full_timeline = [learn_timeline; test_timeline];
     full_timeline = fix(full_timeline ./ params.step);
     %full_timeline = uint16(full_timeline);
 	%full_timeline = typecast(full_timeline, 'uint16');
-disp(full_timeline)
     timeline_signal_id = zeros(1, params.n, 'uint8');
     timeline_signal_id_movie = zeros(1, params.n, 'uint8');
-    %disp(full_timeline);
+    disp(full_timeline);
     % Iterate over the full number of samples (learn+test)
     for i = 1 : size(I_signals, length(dimensions)+1)
         be = full_timeline(i, 1);
@@ -58,7 +56,7 @@ end
 function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
     if nargin < 6
        
-        thr = 127; % important  for signal transfer og =127 for < 127
+        thr = 126; % important  for signal transfer og =127 for < 127
     end
     % test shuffle only image dimensions
     if length(dimensions) == 3
@@ -70,7 +68,7 @@ function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
         image = img;
         
     elseif length(dimensions) == 2
-        image = image < thr;
+        image = image > thr;
         p = randperm(prod(dimensions));
         b = p(1 : uint16(prod(dimensions) * variance));
         image(b) = ~image(b);

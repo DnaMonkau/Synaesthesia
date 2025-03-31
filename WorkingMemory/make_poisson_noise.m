@@ -10,14 +10,12 @@ function [I_poisson_noise] = make_poisson_noise(dimensions)
     T_poisson(T_poisson == 0) = 1;
     T_poisson = cumsum(T_poisson, 2);
     
-    noise_length = max(max(T_poisson, [], 'all'), params.n + 1);
-    I_poisson_noise = zeros(params.quantity_neurons, noise_length, 'single');
-    
+    I_poisson_noise = zeros(params.quantity_neurons, max(T_poisson, [], 'all'));
      I_poisson_noise = single( I_poisson_noise);
     for j = 1:params.quantity_neurons
         for i = 1:params.poisson_n_impulses
             be = T_poisson(j, i);
-            en = min(be + params.poisson_impulse_duration, noise_length);
+            en = T_poisson(j, i) + params.poisson_impulse_duration;
             I_poisson_noise(j, be:en) = amplitude(j, i);
         end
     end

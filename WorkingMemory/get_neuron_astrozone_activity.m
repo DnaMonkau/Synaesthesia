@@ -4,7 +4,8 @@ function [neuron_astrozone_activity, neuron_astrozone_spikes] = ...
     
     mask1 = reshape(Mask_line, dimensions);
     mask1 = single(mask1);
-    glutamate_above_thr = reshape(G >= 0.7, dimensions);
+    glutamate_above_thr = reshape(G, dimensions); % removed the threshold 0.7
+
     neuron_astrozone_activity = zeros(params.mastro, params.nastro, 'int8');
     neuron_astrozone_spikes = zeros(params.mastro, params.nastro, 'int8');
     % kernel = [params.az, params.az;params.az, params.az];
