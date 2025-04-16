@@ -6,7 +6,7 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     if isfield(params, 'learn_order')
         learn_order = params.learn_order;
     else
-        learn_order = make_image_order(num_images, 10, false); 
+        learn_order = make_image_order(num_images, 10, true); 
     end
     
     learn_signals = make_noise_signals(images, learn_order, ...
@@ -16,7 +16,7 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     if isfield(params, 'test_order')
         test_order = params.test_order;
     else
-        test_order = make_image_order(num_images, 1, false);
+        test_order = make_image_order(num_images, 1, true);
     end
     
     test_signals = make_noise_signals(images, test_order, ...
