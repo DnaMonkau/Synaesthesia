@@ -62,13 +62,13 @@ function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
     if length(dimensions) == 3
         % image = image < thr; % check max fow bw vs for color
         img = image;
-        p = randperm(prod(dimensions(1:2)));
-        b = p(1 : uint16(prod(dimensions(1:2)) * variance));
+        p = randperm(prod(dimensions));
+        b = p(1 : uint16(prod(dimensions) * variance));
         img(b) = ~img(b);
         image = img;
         
     elseif length(dimensions) == 2
-        image = image > thr;
+        %image = image < thr;
         p = randperm(prod(dimensions));
         b = p(1 : uint16(prod(dimensions) * variance));
         image(b) = ~image(b);
