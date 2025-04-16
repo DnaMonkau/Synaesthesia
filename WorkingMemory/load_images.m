@@ -141,14 +141,7 @@ function [dimensions, images] = load_images()
     for name = emergent_image_names;
         image = imread(fullfile(images_dir, name{1}));        
         % image = rgb2gray(image);
-        % Synaesthetic input
-        % Isynaesthesia = 0.08;
-        % % permeate all of the elements in the current alterbnatively could also
-        % 
-        % image = image + round(Isynaesthesia * image_m);
-        % randomly permeate along a gaussian distribution
-       	% Prob = reshape(randsample([0, 1], prod(size(image)), true, [0.5-Isynaesthesia, 0.5+Isynaesthesia]), size(image));
-        % image = double(image) + double((Prob*127).*(image<127));
+        image = image./255;
         images{end + 1} = image;
     end
     dimensions = size(image);
