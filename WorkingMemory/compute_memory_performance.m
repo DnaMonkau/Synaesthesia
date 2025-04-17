@@ -46,12 +46,12 @@ end
 
 function similarity = compute_image_similarity(true_image, estimated_image, dimensions)
     otherdims = repmat({':'},1, length(dimensions));
-    pattern_mask = true_image(otherdims{:}) <127;
+    pattern_mask = true_image(otherdims{:});
     % background_mask = true_image(otherdims{:}) >=127;
     
     % n_pattern = sum(pattern_mask, 'all');
     % n_background = sum(background_mask, 'all');
-    n_true_pattern = sum(pattern_mask == ~estimated_image, 'all');
+    n_true_pattern = sum(pattern_mask == estimated_image, 'all');
     % n_true_background = sum(sum(background_mask == estimated_image, 'all');
     % similarity = (n_true_background / n_background + n_true_pattern / n_pattern) / 2;
     similarity = (n_true_pattern) / prod(dimensions);
