@@ -8,19 +8,7 @@ function [neuron_astrozone_activity, neuron_astrozone_spikes] = ...
 
     neuron_astrozone_activity = zeros(params.mastro, params.nastro, 'int8');
     neuron_astrozone_spikes = zeros(params.mastro, params.nastro, 'int8');
-    % kernel = [params.az, params.az;params.az, params.az];
-    % sj = 0;
-    % for j = 1 : params.az : (dimensions(1) - params.az)
-    %     sk = 0;
-    %     for k = 1 : params.az : (dimensions(2) - params.az)
-    %         neuron_astrozone_activity(j - sj, k - sk) = ...
-    %             sum(glutamate_above_thr(j : j + params.az, k : k + params.az), 'all');
-    %         neuron_astrozone_spikes(j - sj, k - sk) = ...
-    %             sum(mask1(j : j + params.az, k : k + params.az), 'all');
-    %         sk = sk + 2;
-    %     end
-    %     sj = sj + 2;
-    % end
+
     if length(dimensions) == 2
         % neuron_astrozone_activity = conv2(glutamate_above_thr, kernel, 'same');
         % neuron_astrozone_spikes  = conv2(mask1, kernel, 'same');
