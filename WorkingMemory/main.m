@@ -1,6 +1,6 @@
 tic;
 %% Initialization
-close all; clearvars;
+%close all; clearvars;
 
 % rng(42);
 num = 30;
@@ -8,7 +8,7 @@ params = model_parameters(true);
 % disp('Parameters defined');
 
 %% multiple runs
-for i = 1:num;
+for i = 27:num;
     model = init_model();
     disp('Model defined');
     % define amount of neurons dynamically
@@ -36,7 +36,7 @@ for i = 1:num;
     fprintf(['Memory performance per image: ', fmt, '\n'], ...
         memory_performance.learned_pattern_similarities);
 
-    txt = sprintf('extended_nonsyn_performance%.1f.mat', i);
+    txt = sprintf('results/fullsyn_performance_shuffle_%.1f.mat', i);
 
     % save('performance.mat' )
 
@@ -56,3 +56,4 @@ for i = 1:num;
 %         rethrow(ME);
 %     end
 %   end
+
