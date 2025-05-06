@@ -34,34 +34,34 @@ function [Post_line,Pre] = create_connections(dimensions)
             end
         end
     else
+     for p = 1 : dimensions(3)
       for i = 1 : dimensions(1)
         for j = 1 : dimensions(2)
-          for p = 1 : dimensions(3)
             %[samples] = fast_weighted_sampling(weights, m);
             
-            XY = zeros(length(dimensions), ties_stock, 'int8');
+            XY = zeros(length(dimensions)-1, ties_stock, 'int8');
             R = random('exp', params.lambda, 1, ties_stock);
             fi = 2 * pi * rand(1, ties_stock);
             XY(1,:) = fix(R .* cos(fi));
             XY(2,:) = fix(R .* sin(fi));
-            XY(3,:) = fix(R .*cos(fi) .*sin(fi)); % check with this off
+            % XY(3,:) = fix(R .*cos(fi) .*sin(fi)); % check with this off
             XY1 = unique(XY', 'row','stable');
             XY = XY1';
             n = 1;
             for k = 1 : ties_stock
                 x = i + XY(1, k);
                 y = j + XY(2, k);
-                z = p + XY(3, k);
-                if z <= 1
-                    z=1;
-                end
-                if (i == x && j == y && p == z)
+                % z = p + XY(3, k);
+                % if z <= 1
+                %     z=1;
+                % end
+                if (i == x && j == y)
                     pp = 1;
                 else pp = 0;
                 end
+                if (x > 0 && y > 0  && x <= dimensions(1) && y <= dimensions(2) && pp == 0) 
                 % if (x > 0 && y > 0  && z > 0 && x <= dimensions(1) && y <= dimensions(2) && z <= dimensions(3) && pp == 0) 
-                if (x > 0 && y > 0  && z > 0 && x <= dimensions(1) && y <= dimensions(2) && z <= dimensions(3) && pp == 0) 
-                    Post(i,j,p,n) = sub2ind(size(Post_for_one), x, y, z);
+                    Post(i,j,p,n) = sub2ind(size(Post_for_one), x, y);
                     n = n + 1;
                 end
                 if n > params.N_connections

@@ -10,10 +10,10 @@ function [V, U, G, Isyn, mask,Iapp] = step_neurons(V, U, G, t_Iapp_met, array_Ia
         Iapp = zeros(dimensions, 'uint8');
     else
         Iapp = array_Iapp(otherdims{:}, t_Iapp_met);
+        
     end
     
     %% Izhikevich neuron model
-    
     Iapp_line = Iapp(:);
     Iapp_line = double(Iapp_line);
     fired = find(V >= params.neuron_fired_thr);
@@ -30,7 +30,6 @@ function [V, U, G, Isyn, mask,Iapp] = step_neurons(V, U, G, t_Iapp_met, array_Ia
     %% Glutamate (neurotransmitter model)
     del = zeros(params.quantity_neurons,1);
     del(V >= params.neuron_fired_thr) = 1;
-    % disp(size(G - params.step))
     G = G - params.step .* (params.alf .* G - params.k  .* del);
     
     %% Neuron synaptic currents

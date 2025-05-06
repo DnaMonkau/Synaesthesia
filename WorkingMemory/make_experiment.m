@@ -6,7 +6,7 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     if isfield(params, 'learn_order')
         learn_order = params.learn_order;
     else
-        learn_order = make_image_order(num_images, 10, true); 
+        learn_order = make_image_order(num_images, 10, false); 
     end
     
     learn_signals = make_noise_signals(images, learn_order, ...
@@ -16,7 +16,7 @@ function [I_signals, full_timeline, timeline_signal_id, ...
     if isfield(params, 'test_order')
         test_order = params.test_order;
     else
-        test_order = make_image_order(num_images, 1, true);
+        test_order = make_image_order(num_images, 1, false);
     end
     
     test_signals = make_noise_signals(images, test_order, ...
@@ -34,8 +34,6 @@ function [I_signals, full_timeline, timeline_signal_id, ...
         length(test_order));
     full_timeline = [learn_timeline; test_timeline];
     full_timeline = fix(full_timeline ./ params.step);
-    %full_timeline = uint16(full_timeline);
-	%full_timeline = typecast(full_timeline, 'uint16');
     timeline_signal_id = zeros(1, params.n, 'uint8');
     timeline_signal_id_movie = zeros(1, params.n, 'uint8');
     disp(full_timeline);
@@ -56,19 +54,26 @@ end
 function [image] = make_noise_signal(image, dimensions, variance, Iapp0, thr)
     if nargin < 6
        
-        thr = 126; % important  for signal transfer og =127 for < 127
+        thr = 127; % important  for signal transfer og =127 for < 127
     end
     % test shuffle only image dimensions
     if length(dimensions) == 3
         % image = image < thr; % check max fow bw vs for color
-        img = image;
         p = randperm(prod(dimensions));
         b = p(1 : uint16(prod(dimensions) * variance));
+        % for i = 1:3
+        %     img = image(:,:,i);
+        % 
+        %     img(b) = ~img(b);
+        %     image(:,:,i) = img;
+        % end
+
+        img = image;
+
         img(b) = ~img(b);
         image = img;
-        
     elseif length(dimensions) == 2
-        %image = image < thr;
+        image = image < thr;
         p = randperm(prod(dimensions));
         b = p(1 : uint16(prod(dimensions) * variance));
         image(b) = ~image(b);
