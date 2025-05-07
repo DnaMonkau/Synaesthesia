@@ -36,7 +36,7 @@ for i = 1:num;
     fprintf(['Memory performance per image: ', fmt, '\n'], ...
         memory_performance.learned_pattern_similarities);
 
-    txt = sprintf('extended_nonsyn_performance%.1f.mat', i);
+    txt = sprintf('results/dissimilar_nonsyn_performance_%.1f.mat', i);
 
     save(txt)
 
