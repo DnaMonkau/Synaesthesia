@@ -1,3 +1,4 @@
+
 from itertools import product
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +13,7 @@ import imageio
 import scipy
 # !pip install torchdiffeq
 # from torchdiffeq import odeint
-!pip install opencv-python
+#pip install opencv-python
 import cv2
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -324,7 +325,7 @@ def apply():
     #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
     #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
     #     ]
-    for file in os.listdir():
+    for file in os.listdir('../Synaesthesia/WorkingMemory/images/'):
         if 'jpg' in file:
           img = cv2.imread(file)
           img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
@@ -384,12 +385,13 @@ def apply():
         # break
       col.append(colour_predictionhsv_mean)
       col_rand.append(colour_random_mean)
+    return col, col_rand
 
 
-def color_grapheme():
+def color_grapheme(col, col_rand):
     i=0
     print(np.shape(col))
-    rgb_median =  numpy2hsv(np.array(colour_predictionhsv_median)).astype(int)
+    #rgb_median =  numpy2hsv(np.array(colour_predictionhsv_median)).astype(int)
     for file in os.listdir():
       if 'jpg'  in file:
         rgb_mean =  scipy.stats.mode(np.array(col)[:,i])[0]
@@ -412,5 +414,6 @@ def color_grapheme():
         i+=1
 
       print('-----')
-    !zip -r res.zip res/
-color_grapheme()
+
+col, col_rand = apply()
+color_grapheme(col, col_rand)
