@@ -405,8 +405,8 @@ def color_grapheme():
 
         # cv2_imshow(img_r)
 
-        cv2.imwrite('res/'+'emergent_colour_'+file, img_c)
-        cv2.imwrite('res/'+'trivial_colour_'+file, img_r)
+        cv2.imwrite('../Synaesthesia/res/'+'emergent_colour_'+file, img_c)
+        cv2.imwrite('../Synaesthesia/res/'+'trivial_colour_'+file, img_r)
 
         # plt.show()
         i+=1
