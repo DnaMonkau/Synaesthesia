@@ -2,7 +2,7 @@
 from itertools import product
 import numpy as np
 import matplotlib.pyplot as plt
-from torch.distributions import normal as tdist
+# from torch.distributions import normal as tdist
 import torch
 import torch.nn as nn
 from tqdm import tqdm
@@ -16,7 +16,7 @@ import scipy
 #pip install opencv-python
 import cv2
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+PATH = '../Synaesthesia/WorkingMemory/images/original'
 class GraphemeColourSynaesthesiaNet(nn.Module):
   def __init__(self, input_dim, M, max_iter  = 10, tau=1.0,tolfun=4e-003,  eta=0.01, eta_w =0.01, cross_talk = True, modalities = 2, FF = False):
     super(GraphemeColourSynaesthesiaNet, self).__init__()
@@ -265,7 +265,7 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     return torch.tensor(cat_array)
 
 def train(emergence_iterations=50):
-  img = cv2.imread('zero.jpg')
+  img = cv2.imread(os.path.join(PATH, 'zero.jpg'))
   img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
   # flat gray scale number array
   x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
@@ -287,10 +287,11 @@ def train(emergence_iterations=50):
   #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
   #     ]
   x = []
+  
   for i in range(3):
-    for file in os.listdir('../Synaesthesia/WorkingMemory/images/original'):
+    for file in os.listdir(PATH):
         if 'jpg'  in file:
-            img = cv2.imread(file)
+            img = cv2.imread(os.path.join(PATH, file))
             img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
             x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
             # normalise
@@ -325,9 +326,9 @@ def apply():
     #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
     #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
     #     ]
-    for file in os.listdir('../Synaesthesia/WorkingMemory/images/original'):
+    for file in os.listdir(PATH):
         if 'jpg' in file:
-          img = cv2.imread(file)
+          img = cv2.imread(os.path.join(PATH, file))
           print(file)
           img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
           x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
@@ -393,13 +394,13 @@ def color_grapheme(col, col_rand):
     i=0
     print(np.shape(col))
     #rgb_median =  numpy2hsv(np.array(colour_predictionhsv_median)).astype(int)
-    for file in os.listdir('../Synaesthesia/WorkingMemory/images/original'):
+    for file in os.listdir(PATH):
       if 'jpg'  in file:
         rgb_mean =  scipy.stats.mode(np.array(col)[:,i])[0]
         random_mean = scipy.stats.mode(np.array(col_rand)[:,i])[0]
 
 
-        img = cv2.imread(file)
+        img = cv2.imread(os.path.join(PATH, file))
 
         img_c = np.where(img< 127, rgb_mean*255, 255)
         img_r = np.where(img< 127, random_mean*255, 255)
