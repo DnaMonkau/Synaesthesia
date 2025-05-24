@@ -288,7 +288,7 @@ def train(emergence_iterations=50):
   #     ]
   x = []
   for i in range(3):
-    for file in os.listdir():
+    for file in os.listdir('../Synaesthesia/WorkingMemory/images/original'):
         if 'jpg'  in file:
             img = cv2.imread(file)
             img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
@@ -325,7 +325,7 @@ def apply():
     #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
     #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
     #     ]
-    for file in os.listdir('../Synaesthesia/WorkingMemory/images/'):
+    for file in os.listdir('../Synaesthesia/WorkingMemory/images/original'):
         if 'jpg' in file:
           img = cv2.imread(file)
           img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
@@ -392,7 +392,7 @@ def color_grapheme(col, col_rand):
     i=0
     print(np.shape(col))
     #rgb_median =  numpy2hsv(np.array(colour_predictionhsv_median)).astype(int)
-    for file in os.listdir():
+    for file in os.listdir('../Synaesthesia/WorkingMemory/images/original'):
       if 'jpg'  in file:
         rgb_mean =  scipy.stats.mode(np.array(col)[:,i])[0]
         random_mean = scipy.stats.mode(np.array(col_rand)[:,i])[0]
