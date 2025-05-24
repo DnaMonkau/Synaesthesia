@@ -328,6 +328,7 @@ def apply():
     for file in os.listdir('../Synaesthesia/WorkingMemory/images/original'):
         if 'jpg' in file:
           img = cv2.imread(file)
+          print(file)
           img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
           x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
           # normalise
