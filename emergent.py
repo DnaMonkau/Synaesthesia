@@ -257,7 +257,7 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     return self.logistic_derivative(x) * (1 - 2*self.g(x))
   def third_logistic_derivative(self, x):
     return self.second_logistic_derivative(x)* (1 - 2*self.g(x)) - 2*self.logistic_derivative(x)**2
-  def colour_cat(self, tensor, colours = torch.tensor([0, 0.25, 0.5, 0.75])):
+  def colour_cat(self, tensor, colours = torch.tensor([0, 0.33, 0.66, 0.99])):
     cat_array =[]
     for i in range(len(tensor)):
       index = torch.argmin(abs(tensor[i] - colours))
