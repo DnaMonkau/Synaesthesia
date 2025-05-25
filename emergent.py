@@ -272,7 +272,7 @@ def train(emergence_iterations=50):
   # normalise
   x1 = x1/255
   # colour category per pixel 0=original  blue=green
-  x2 = torch.from_numpy(np.random.choice([0, 0.25, 0.5, 0.75], size = len(x1)).astype('float32'))
+  x2 = torch.from_numpy(np.random.choice([0, 0.33, 0.66, 0.99], size = len(x1)).astype('float32'))
 
   simulation_emergence_data = torch.stack([x1, x2])
   E_Network = GraphemeColourSynaesthesiaNet(np.shape(simulation_emergence_data), M=len(x1)*2, max_iter=emergence_iterations)
@@ -298,7 +298,7 @@ def train(emergence_iterations=50):
             x1 = x1<127
             # colour category per pixel 0=original  blue=green
             # x2 = torch.from_numpy(np.random.choice(range(0,360), size = len(x1)).astype('float32'))
-            x2 = torch.from_numpy(np.random.choice([0, 0.25, 0.5, 0.75], size = len(x1)).astype('float32'))
+            x2 = torch.from_numpy(np.random.choice([0, 0.33, 0.66, 0.99], size = len(x1)).astype('float32'))
             # # normalise
             # x2 = x2/360
             simulation_emergence_data = torch.stack([x1, x2])
@@ -371,7 +371,7 @@ def apply():
         b = Net.colour_cat([np.mean(s2[chunk*2:])])[0]
         rgb_means = np.array([r, g, b])
 
-        random_vector = np.random.choice([0, 0.25, 0.5, 0.75], size=len(x1))
+        random_vector = np.random.choice([0, 0.33, 0.66, 0.99], size=len(x1))
         rr = Net.colour_cat([np.mean(random_vector[:chunk])])[0]
         gr = Net.colour_cat([np.mean(random_vector[chunk: chunk*2])])[0]
         br = Net.colour_cat([np.mean(random_vector[chunk*2:])])[0]
@@ -409,8 +409,8 @@ def color_grapheme(col, col_rand):
 
         # cv2_imshow(img_r)
 
-        cv2.imwrite('../Synaesthesia/res/'+'emergent_colour_'+file, img_c)
-        cv2.imwrite('../Synaesthesia/res/'+'trivial_colour_'+file, img_r)
+        cv2.imwrite('../Synaesthesia/new_res/'+'emergent_colour_'+file, img_c)
+        cv2.imwrite('../Synaesthesia/new_res/'+'trivial_colour_'+file, img_r)
 
         # plt.show()
         i+=1
