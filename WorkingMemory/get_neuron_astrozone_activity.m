@@ -12,7 +12,7 @@ function [neuron_astrozone_activity, neuron_astrozone_spikes] = ...
     if length(dimensions) == 2
         % neuron_astrozone_activity = conv2(glutamate_above_thr, kernel, 'same');
         % neuron_astrozone_spikes  = conv2(mask1, kernel, 'same');
-        sj = 0;
+        sj = 0; 
         for j = 1 : params.az : (dimensions(1) - params.az)
             sk = 0;
             for k = 1 : params.az : (dimensions(2) - params.az)

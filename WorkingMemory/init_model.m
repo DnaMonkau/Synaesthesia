@@ -8,7 +8,7 @@ model.dimensions = dimensions;
 params.quantity_neurons = prod(dimensions);
 params.quantity_connections = params.quantity_neurons * params.N_connections;
 
-%% Zone
+%% Zone 
 model.Post = zeros(1, params.quantity_connections, 'int8');
 model.Pre  = zeros(1, params.quantity_connections, 'int8');
 
