@@ -392,14 +392,19 @@ def apply():
 
 def color_grapheme(col, col_rand):
     i=0
+    HSV_rgb = []
+    HSV_random = []
     print(np.shape(col))
     #rgb_median =  numpy2hsv(np.array(colour_predictionhsv_median)).astype(int)
     for file in os.listdir(PATH):
       if 'jpg'  in file:
         rgb_mean =  scipy.stats.mode(np.array(col)[:,i])[0]
         random_mean = scipy.stats.mode(np.array(col_rand)[:,i])[0]
-
-
+        hsv_rgb = cv2.cvtColor(np.array(rgb_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0,0]
+        hsv_random = cv2.cvtColor(np.array(random_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0,0]
+        HSV_rgb.append(hsv_rgb)
+        HSV_random.append(hsv_random)
+      
         img = cv2.imread(os.path.join(PATH, file))
 
         img_c = np.where(img< 127, rgb_mean*255, 255)
@@ -416,6 +421,15 @@ def color_grapheme(col, col_rand):
         i+=1
 
       print('-----')
+    sns.histplot(np.array(HSV_rgb) , bins=10, kde=True)
+    plt.title('Colour hue distribution for the colour modality output')
+    plt.savefig('RGB_Colour.jpg')
+    plt.show()
+    sns.histplot(np.array(HSV_random) , bins=10, kde=True)
+    plt.title('Colour hue distribution for the random colour output')
+    plt.savefig('Random_Colour.jpg')
+    plt.show()
+
 
 col, col_rand = apply()
 color_grapheme(col, col_rand)
