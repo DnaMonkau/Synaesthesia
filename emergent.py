@@ -1,6 +1,8 @@
 
 from itertools import product
 import numpy as np
+from colorsys import hsv_to_rgb
+import scipy.stats
 import matplotlib.pyplot as plt
 # from torch.distributions import normal as tdist
 import torch
@@ -10,16 +12,40 @@ from random import random
 import scipy
 import os
 import imageio
-import scipy
 import seaborn as sns
+import scipy
 # !pip install torchdiffeq
 # from torchdiffeq import odeint
 #pip install opencv-python
 import cv2
+import random
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 PATH = '../Synaesthesia/WorkingMemory/images/original'
+
+def numpy2hsv(array):
+  rgbimg = np.zeros((len(array), 3))
+  for i in range(len(array)):
+    rgbimg[i] = hsv_to_rgb(array[i],1,1)
+  return rgbimg*255
+def create_rgb_to_bin(N, colour_set=(np.array([0, 0.33, 0.66, 0.99])*255).astype(int)):
+  chunk = N //3
+  colours = []
+  rgb_bin = []
+  for r in colour_set:
+    for g in colour_set:
+      for b in colour_set:
+        if [r,g,b] not in colours:
+          colours.append([r,g,b])
+          r_chunk = list(str(bin(r)[2:]).zfill(chunk))
+          g_chunk = list(str(bin(g)[2:]).zfill(N-chunk*2))
+          b_chunk = list(str(bin(b)[2:]).zfill(chunk))
+          rgb_bin.append(np.array(r_chunk+  g_chunk+ b_chunk).astype(int))
+
+  return rgb_bin, colours
+
+#############################################################################################################################
 class GraphemeColourSynaesthesiaNet(nn.Module):
-  def __init__(self, input_dim, M, max_iter  = 10, tau=1.0,tolfun=4e-003,  eta=0.01, eta_w =0.01, cross_talk = True, modalities = 2, FF = False):
+  def __init__(self, input_dim, M, max_iter  = 10, tau=1.0,tolfun=4e-005, eta=0.01, eta_w =0.01, cross_talk = True, modalities = 2, FF = True):
     super(GraphemeColourSynaesthesiaNet, self).__init__()
 
     self.modalities = input_dim[0] # Amount of modalities
@@ -62,7 +88,7 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
       self.K = nn.Parameter(torch.zeros(self.M, self.M), requires_grad=False) # start at 0 fixed point
     # Initialise feedforward weights
     if self.FF:
-      self.W = nn.Parameter(torch.randn(self.M, self.N), requires_grad=True)
+      self.W = nn.Parameter(torch.empty(self.M, self.N).uniform_(0,0.6), requires_grad=True)
     else:
       self.W = nn.Parameter(torch.randn(self.M, self.N), requires_grad=False)
 
@@ -195,7 +221,8 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
         s2 = self.s2.clone()
         self.Ks.append(self.K.clone())
 
-        # if i%100 ==0:
+        if i == iterations//10:
+          self.FF = False
         #   plt.imshow(np.reshape(self.x[:64].detach().numpy(),(8,8)))
         #   plt.show()
         if (abs(self.K) == 0).all():
@@ -204,11 +231,13 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
         else:
           status.append('Unstable')
           self.feedforward_dynamics(x, i, s1, s2, samp_ts)
-      self.s2 = self.colour_cat(self.s2)
+          self.FF = False
+
+      # self.s2 = self.colour_cat(self.s2)
+      # self.s2 = self.colour_bin(self.s2)
       loss, chi, G, phi = self.objective_function(x, loss, s1, s2)
       if self.convergence( s1_prev, s2_prev, s1, s2, loss, i): # steady-stae
         converged.append(i)
-        self.FF = False
         print('converged')
         break
       self.learning_rule(x,chi, G, phi, loss)
@@ -233,7 +262,7 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
       # print('\n --- \n Diverged or reached max iterations after at iteration: ', converged[-1], '\n --- \n')
     else:
       print('\n --- Did not converge \n ---\n ')
-
+    self.s2 = self.rgb_bin_closeness(len(self.s2), self.s2)[0]
     return status, converged
   def train(self, x, max_iter):
     status, converged = self.forward(x, max_iter,  d=True)
@@ -242,13 +271,12 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     s1, s2 = torch.reshape(s,  (2,self.M//2))
     s = torch.stack([s2, s1]).flatten()
     s = self.g(torch.matmul(self.W, x) + torch.matmul(self.K, s.T))
-    s[self.M//2:] = self.colour_cat(s[self.M//2:] )
+    s[self.M//2:] = s[self.M//2:]
     return s
 
   #helper functions
   def dynamics(self, t, s):
-    s1, s2 = torch.reshape(s, (self.modalities, self.M))
-    s = torch.stack([s2, s1]).flatten()
+    # print((self.W1 @ x[0] + self.K[0][1].clone() * s[1]))
     s_dt = -s + self.g(self.W @ self.x + self.K @ s)/self.tau
     s1_dt, s2_dt = s_dt[:self.M//2], s_dt[self.M//2:]
     return torch.stack([s1_dt, s2_dt]).flatten()
@@ -265,6 +293,26 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
       cat_array.append(colours[index])
     return torch.tensor(cat_array)
 
+  def rgb_bin_closeness(self, N, array, colour_set=torch.tensor([0, 0.33, 0.66, 0.99])*255, dtype =int):
+    array = array.detach().numpy()
+    chunk = N //3
+    r = array[:N//3].astype(int)
+    g = array[N//3:-N//3].astype(int)
+    b = array[-N//3:].astype(int)
+    r_dec = int(''.join(map(str,(r[-8:]))),2)
+    g_dec = int(''.join(map(str,(g[-8:]))),2)
+    b_dec = int(''.join(map(str,(b[-8:]))),2)
+    r  = int(colour_set[torch.argmin(abs(colour_set - r_dec))].item())
+    g  = int(colour_set[torch.argmin(abs(colour_set - g_dec))].item())
+    b  = int(colour_set[torch.argmin(abs(colour_set - b_dec))].item())
+    r_chunk = list(str(bin(r)[2:]).zfill(chunk))
+    g_chunk = list(str(bin(g)[2:]).zfill(N-chunk*2))
+    b_chunk = list(str(bin(b)[2:]).zfill(chunk))
+    arr = np.array([r_chunk+g_chunk+b_chunk]).astype(int)
+    array = torch.tensor(arr)
+
+    return array
+#########################################################################################################
 def train(emergence_iterations=50):
   img = cv2.imread(os.path.join(PATH, 'zero.jpg'))
   img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
@@ -273,23 +321,27 @@ def train(emergence_iterations=50):
   # normalise
   x1 = x1/255
   # colour category per pixel 0=original  blue=green
-  x2 = torch.from_numpy(np.random.choice([0, 0.33, 0.66, 0.99], size = len(x1)).astype('float32'))
+  # x2 = torch.from_numpy(np.random.choice([0, 0.33, 0.66, 0.99], size = len(x1)).astype('float32'))
+  rgb_bin, _ = create_rgb_to_bin(len(x1))
+  x2 = torch.from_numpy(rgb_bin[0])
+
+  x2 = torch.from_numpy(rgb_bin[0])
 
   simulation_emergence_data = torch.stack([x1, x2])
   E_Network = GraphemeColourSynaesthesiaNet(np.shape(simulation_emergence_data), M=len(x1)*2, max_iter=emergence_iterations)
-
   #syn
   weights1 = E_Network.W
   Isynaesthesias = []
   convergences = []
-  i = 0
   # bw = image_names = [
   #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
   #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
   #     ]
   x = []
-  
-  for i in range(3):
+  for i in range(3): # train on all colour grapheme combinations
+    j = 0
+    random.shuffle(rgb_bin)
+
     for file in os.listdir(PATH):
         if 'jpg'  in file:
             img = cv2.imread(os.path.join(PATH, file))
@@ -299,12 +351,12 @@ def train(emergence_iterations=50):
             x1 = x1<127
             # colour category per pixel 0=original  blue=green
             # x2 = torch.from_numpy(np.random.choice(range(0,360), size = len(x1)).astype('float32'))
-            x2 = torch.from_numpy(np.random.choice([0, 0.33, 0.66, 0.99], size = len(x1)).astype('float32'))
-            # # normalise
-            # x2 = x2/360
+            x2 = torch.from_numpy(rgb_bin[j].astype(np.float32))
+            # normalise
+
             simulation_emergence_data = torch.stack([x1, x2])
             x.append(simulation_emergence_data)
-
+            j+=1
   x = torch.stack(x)
   shuffled_indices = torch.randperm(x.shape[0])
 
@@ -314,123 +366,149 @@ def train(emergence_iterations=50):
   x = torch.from_numpy(x)
   status, converged = E_Network.train(x, emergence_iterations)
   return E_Network, status, converged
-# Net,_,_ = train(False)
-def numpy2hsv(array):
-  rgbimg = np.zeros((len(array), 3))
-  for i in range(len(array)):
-    rgbimg[i] = hsv_to_rgb(array[i],1,1)
-  return rgbimg*255
-
-def apply():
-    x = []
-    # bw = image_names = [
-    #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
-    #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
-    #     ]
-    for file in os.listdir(PATH):
-        if 'jpg' in file:
-          img = cv2.imread(os.path.join(PATH, file))
-          print(file)
-          img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
-          x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
-          # normalise
-          x1 = x1/255
-
-          x2 = torch.zeros(len(x1))
-
-          simulation_emergence_data = torch.stack([x1, x2])
-          x.append(simulation_emergence_data)
-
-    col= []
-    col_rand = []
-    chunk = int(len(x2)/3) # rgb = 3
-
-    for i in range(3000):
-      colour_random_mean = []
-      colour_predictionhsv_median = []
-      colour_predictionhsv_mean = []
-      colours = []
-
-      # train
-      Net, status, converged = train(10)
-      # prediction
-      for j in range(len(x)):
-        xs = torch.from_numpy(np.array(x[j])).flatten()
-
-        xs[64:] = torch.from_numpy(np.zeros(len(x1)).astype('float32')) # set colour to 0
-        s = torch.zeros(np.shape(xs))
-        s1, s2= torch.reshape(Net.predict(xs, s), (2,64))
-
-
-        s1 = s1.detach().numpy()
-        s2 = s2.detach().numpy()
-        # r = scipy.stats.mode(s2[:chunk]).mode
-        # g =  scipy.stats.mode(s2[chunk: chunk*2]).mode
-        # b =  scipy.stats.mode(s2[chunk*2:]).mode
-        r = Net.colour_cat([np.mean(s2[:chunk])])[0]
-        g = Net.colour_cat([np.mean(s2[chunk: chunk*2])])[0]
-        b = Net.colour_cat([np.mean(s2[chunk*2:])])[0]
-        rgb_means = np.array([r, g, b])
-
-        random_vector = np.random.choice([0, 0.33, 0.66, 0.99], size=len(x1))
-        rr = Net.colour_cat([np.mean(random_vector[:chunk])])[0]
-        gr = Net.colour_cat([np.mean(random_vector[chunk: chunk*2])])[0]
-        br = Net.colour_cat([np.mean(random_vector[chunk*2:])])[0]
-        # rr = scipy.stats.mode(random_vector[:chunk]).mode
-        # gr =  scipy.stats.mode(random_vector[chunk: chunk*2]).mode
-        # br =  scipy.stats.mode(random_vector[chunk*2:]).mode
-
-        rand_means = np.array([rr, gr, br])
-
-        colour_predictionhsv_mean.append(rgb_means)
-        colour_random_mean.append(rand_means)
-
-        # break
-      col.append(colour_predictionhsv_mean)
-      col_rand.append(colour_random_mean)
-    return col, col_rand
-
-
-def color_grapheme(col, col_rand):
-    i=0
-    HSV_rgb = []
-    HSV_random = []
-    print(np.shape(col))
-    #rgb_median =  numpy2hsv(np.array(colour_predictionhsv_median)).astype(int)
-    for file in os.listdir(PATH):
-      if 'jpg'  in file:
-        rgb_mean =  scipy.stats.mode(np.array(col)[:,i])[0]
-        random_mean = scipy.stats.mode(np.array(col_rand)[:,i])[0]
-        hsv_rgb = cv2.cvtColor(np.array(rgb_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0,0]
-        hsv_random = cv2.cvtColor(np.array(random_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0,0]
-        HSV_rgb.append(hsv_rgb)
-        HSV_random.append(hsv_random)
-      
+def run():
+  x = []
+  col= []
+  col_rand = []
+  # bw = image_names = [
+  #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
+  #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
+  #     ]
+  for file in os.listdir(PATH):
+      if 'jpg' in file:
         img = cv2.imread(os.path.join(PATH, file))
+        img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
+        x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
+        # normalise
+        x1 = x1/255
+        # colour category per pixel 0=original  blue=green
+        x2 = torch.zeros(len(x1))
+        simulation_emergence_data = torch.stack([x1, x2])
+        x.append(simulation_emergence_data)
+  chunk = int(len(x2)/3) # a chunk for every channel, rgb = 3
+  S = 3000 # sessions
+  for i in range(S):
+    colour_random_mean = []
+    colour_predictionhsv_median = []
+    colour_predictionhsv_mean = []
+    colours = []
 
-        img_c = np.where(img< 127, rgb_mean*255, 255)
-        img_r = np.where(img< 127, random_mean*255, 255)
-        # cv2_imshow(img_c)
-        # plt.show()
+    # train
+    Net, status, converged = train(10)
+    # Run predictions per grapheme
+    for j in range(len(x)):
+      xs = torch.from_numpy(np.array(x[j])).flatten()
+      xs[64:] = torch.from_numpy(np.zeros(len(x1)).astype('float32')) # set colour to 0
+      s = torch.zeros(np.shape(xs))
+      s1, s2= torch.reshape(Net.predict(xs, s), (2,64))
+      # Assign categorical colors 1 out of 81
+      s2 = Net.rgb_bin_closeness(64,s2)[0]
+      s1 = s1.detach().numpy()
+      s2 = s2.detach().numpy()
+      # Calculate decimal value per binary code 
+      r = (s2[:chunk]).astype(int)
+      g =(s2[chunk: -chunk]).astype(int)
+      b =(s2[-chunk:]).astype(int)
+      re = int(''.join(map(str,(r[-8:]))),2)
+      ge = int(''.join(map(str,(g[-8:]))),2)
+      be = int(''.join(map(str,(b[-8:]))),2)
+      # Add rgb values
+      rgb_space = np.array([re, ge, be])
+      # Create random vector
+      random_vector = torch.tensor(np.random.choice([0, 1], size=len(x1)))
+      # Calculate decimal value per binary code 
+      random_vector = (Net.rgb_bin_closeness(64,random_vector)[0]).detach().numpy()
+      random_r = (random_vector[:chunk]).astype(int)
+      random_g =(random_vector[chunk: -chunk]).astype(int) 
+      random_b =(random_vector[-chunk:]).astype(int)
+      rr = int(''.join(map(str,(random_r[-8:]))),2)
+      gr = int(''.join(map(str,(random_g[-8:]))),2)
+      br = int(''.join(map(str,(random_b[-8:]))),2)
+      # Add rgb values
+      rand_rgb_space = np.array([rr, gr, br])
 
-        # cv2_imshow(img_r)
+      colour_predictionhsv_mean.append(rgb_space)
+      colour_random_mean.append(rand_rgb_space)
 
-        cv2.imwrite('../Synaesthesia/new_res/'+'emergent_colour_'+file, img_c)
-        cv2.imwrite('../Synaesthesia/new_res/'+'trivial_colour_'+file, img_r)
+    col.append(colour_predictionhsv_mean)
+    col_rand.append(colour_random_mean)
+  return col, col_rand
+def colour_in_grapheme(col, col_rand):
+  i=0
+  HSV_rgb2 = []
+  HSV_random = []
+  rgb = []
+  randoms = []
+  for file in os.listdir(PATH):
+    if 'jpg'  in file:
+      # Get emergent colours per grapheme over all sessions
+      column = np.array(col)[:,i]
+      
+      # Get most common colour excluding black
+      # column = [c for c in np.array(col)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
+      # Get most common colour excluding black
+      # if column: # Check if column is not empty after removing [0,0,0]
+        # rgb_mode = scipy.stats.mode(column)[0]
+      # else:
+        # rgb_mode = scipy.stats.mode(np.array(col)[:,i])[0]
+      
+      rgb_mode = scipy.stats.mode(column)[0]
+      # Get random colours per grapheme over all sessions
+      column = np.array(col_rand)[:,i]
 
-        # plt.show()
-        i+=1
+      # Get most common colour excluding black
+      # column = [c for c in np.array(col_rand)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
+      # if column: # Check if column is not empty after removing [0,0,0]
+        # random_mode = scipy.stats.mode(column)[0]
+      # else:
+        # random_mode = scipy.stats.mode(np.array(col)[:,i])[0]
+      # Get most common colour
+      random_mode = scipy.stats.mode(column)[0]
+      
+      ## HSV transformation for hue histogram
+      # hsv_rgb = cv2.cvtColor(np.array(rgb_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
+      # hsv_random = cv2.cvtColor(np.array(random_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
+      # HSV_rgb2.append(hsv_rgb)
+      # HSV_random.append(hsv_random)
 
-      print('-----')
-    sns.histplot(np.array(HSV_rgb) , bins=10, kde=True)
-    plt.title('Colour hue distribution for the colour modality output')
-    plt.savefig('RGB_Colour.jpg')
-    plt.show()
-    sns.histplot(np.array(HSV_random) , bins=10, kde=True)
-    plt.title('Colour hue distribution for the random colour output')
-    plt.savefig('Random_Colour.jpg')
-    plt.show()
+      img = cv2.imread(os.path.join(PATH, file))
+      # Add colour to black space in grapheme, a.k.a pattern
+      img_c = np.where(img< 127, rgb_mode, 255)
+      img_r = np.where(img< 127, random_mode, 255)
 
+      # cv2_imshow(img_c)
+      # plt.show()
+      # cv2_imshow(img_r)
+      # plt.show()
+      rgb.append(rgb_mode)
+      randoms.append(random_mode)
+      cv2.imwrite('../Synaesthesia/new_res/'+'emergent_colour_'+file, img_c)
+      cv2.imwrite('../Synaesthesia/new_res/'+'trivial_colour_'+file, img_r)
+      i+=1
+  # zip -r res.zip res/
+  return rgb, randoms
+def emergent_stats(rgb, randoms):
+  channels = ['red', 'green', 'blue']
+  sns.set_palette(sns.diverging_palette(145, 300, s=60, n=3))
+  for i, colour in enumerate(channels):
+    sns.histplot(np.array(rgb)[:,i] , bins=50, kde=True, label = '(emergent) '+colour)
+  plt.legend()
+  plt.title('Emergent colour per grapheme in RGB space histogram')
+  plt.savefig('random_hist_col_graph.jpg')
+  plt.show()
 
-col, col_rand = apply()
-color_grapheme(col, col_rand)
+  for i, colour in enumerate(channels):
+    sns.histplot(np.array(randoms)[:,i] , bins=50, kde=True,  label = '(random) '+colour)
+  plt.legend()
+  plt.title('Randomly generated colour per grapheme in RGB space histrogram') 
+  plt.savefig('random_hist_col_graph.jpg')
+  plt.show()
+  with open("stats_emer.txt", "a") as f:
+    f.write("Mann-Whitney {mann:}\nT-test{ttest} \nAnova {anova}".format(mann=scipy.stats.mannwhitneyu(rgb, randoms), 
+                                         ttest = scipy.stats.ttest_ind(rgb, randoms), 
+                                         anova = scipy.stats.f_oneway(rgb, randoms)))
+
+###################################################################################################
+col, col_rand = run()
+rgb, randoms = colour_in_grapheme(col, col_rand)
+emergent_stats(rgb, randoms)
