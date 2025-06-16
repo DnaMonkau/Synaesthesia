@@ -27,7 +27,7 @@ def numpy2hsv(array):
   for i in range(len(array)):
     rgbimg[i] = hsv_to_rgb(array[i],1,1)
   return rgbimg*255
-def create_rgb_to_bin(N, colour_set=(np.array([0, 0.33, 0.66, 0.99])*255).astype(int)):
+def create_rgb_to_bin(N, colour_set=(np.array([0.1, 0.3, 0.7, 0.9])*255).astype(int)):
   chunk = N //3
   colours = []
   rgb_bin = []
@@ -286,14 +286,14 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     return self.logistic_derivative(x) * (1 - 2*self.g(x))
   def third_logistic_derivative(self, x):
     return self.second_logistic_derivative(x)* (1 - 2*self.g(x)) - 2*self.logistic_derivative(x)**2
-  def colour_cat(self, tensor, colours = torch.tensor([0, 0.33, 0.66, 0.99])):
+  def colour_cat(self, tensor, colours = torch.tensor([0.1, 0.3, 0.7, 0.9])):
     cat_array =[]
     for i in range(len(tensor)):
       index = torch.argmin(abs(tensor[i] - colours))
       cat_array.append(colours[index])
     return torch.tensor(cat_array)
 
-  def rgb_bin_closeness(self, N, array, colour_set=torch.tensor([0, 0.33, 0.66, 0.99])*255, dtype =int):
+  def rgb_bin_closeness(self, N, array, colour_set=torch.tensor([0.1, 0.3, 0.7, 0.9])*255, dtype =int):
     array = array.detach().numpy()
     chunk = N //3
     r = array[:N//3].astype(int)
