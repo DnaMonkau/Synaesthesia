@@ -494,7 +494,7 @@ def emergent_stats(rgb, randoms):
     sns.histplot(np.array(rgb)[:,i] , bins=50, kde=True, label = '(emergent) '+colour)
   plt.legend()
   plt.title('Emergent colour per grapheme in RGB space histogram')
-  plt.savefig('random_hist_col_graph.jpg')
+  plt.savefig('rgb_hist_col_graph.jpg')
   plt.show()
 
   for i, colour in enumerate(channels):
