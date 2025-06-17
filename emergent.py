@@ -438,7 +438,7 @@ def colour_in_grapheme(col, col_rand):
   HSV_random = []
   rgb = []
   randoms = []
-  for j in range(len(col):
+  for j in range(len(col)):
     i=0
     for file in os.listdir(PATH):
       if 'jpg'  in file:
