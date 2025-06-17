@@ -483,8 +483,8 @@ def colour_in_grapheme(col, col_rand):
         # plt.show()
         rgb.append(rgb_mode)
         randoms.append(random_mode)
-        cv2.imwrite('../Synaesthesia/WorkingMemory/images/all_brains/emergent_colour_'+j+'_'+file, img_c)
-        cv2.imwrite('../SynaesthesiaWorkingMemory/images/all_brains/trivial_colour_'+j+'_'+file, img_r)
+        cv2.imwrite('../Synaesthesia/WorkingMemory/images/all_brains/emergent_colour_'+str(j)+'_'+file, img_c)
+        cv2.imwrite('../SynaesthesiaWorkingMemory/images/all_brains/trivial_colour_'+str(j)+'_'+file, img_r)
         i+=1
   # zip -r res.zip res/
   return rgb, randoms
