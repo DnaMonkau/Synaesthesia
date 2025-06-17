@@ -434,57 +434,58 @@ def run():
     col_rand.append(colour_random_mean)
   return col, col_rand
 def colour_in_grapheme(col, col_rand):
-  i=0
   HSV_rgb2 = []
   HSV_random = []
   rgb = []
   randoms = []
-  for file in os.listdir(PATH):
-    if 'jpg'  in file:
-      # Get emergent colours per grapheme over all sessions
-      column = np.array(col)[:,i]
-      
-      # Get most common colour excluding black
-      # column = [c for c in np.array(col)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
-      # Get most common colour excluding black
-      # if column: # Check if column is not empty after removing [0,0,0]
-        # rgb_mode = scipy.stats.mode(column)[0]
-      # else:
-        # rgb_mode = scipy.stats.mode(np.array(col)[:,i])[0]
-      
-      rgb_mode = scipy.stats.mode(column)[0]
-      # Get random colours per grapheme over all sessions
-      column = np.array(col_rand)[:,i]
-
-      # Get most common colour excluding black
-      # column = [c for c in np.array(col_rand)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
-      # if column: # Check if column is not empty after removing [0,0,0]
-        # random_mode = scipy.stats.mode(column)[0]
-      # else:
-        # random_mode = scipy.stats.mode(np.array(col)[:,i])[0]
-      # Get most common colour
-      random_mode = scipy.stats.mode(column)[0]
-      
-      ## HSV transformation for hue histogram
-      # hsv_rgb = cv2.cvtColor(np.array(rgb_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
-      # hsv_random = cv2.cvtColor(np.array(random_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
-      # HSV_rgb2.append(hsv_rgb)
-      # HSV_random.append(hsv_random)
-
-      img = cv2.imread(os.path.join(PATH, file))
-      # Add colour to black space in grapheme, a.k.a pattern
-      img_c = np.where(img< 127, rgb_mode, 255)
-      img_r = np.where(img< 127, random_mode, 255)
-
-      # cv2_imshow(img_c)
-      # plt.show()
-      # cv2_imshow(img_r)
-      # plt.show()
-      rgb.append(rgb_mode)
-      randoms.append(random_mode)
-      cv2.imwrite('../Synaesthesia/new_res/'+'emergent_colour_'+file, img_c)
-      cv2.imwrite('../Synaesthesia/new_res/'+'trivial_colour_'+file, img_r)
-      i+=1
+  for j in range(len(col):
+    i=0
+    for file in os.listdir(PATH):
+      if 'jpg'  in file:
+        # Get emergent colours per grapheme over all sessions
+        column = np.array(col)[j, i]
+        
+        # Get most common colour excluding black
+        # column = [c for c in np.array(col)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
+        # Get most common colour excluding black
+        # if column: # Check if column is not empty after removing [0,0,0]
+          # rgb_mode = scipy.stats.mode(column)[0]
+        # else:
+          # rgb_mode = scipy.stats.mode(np.array(col)[:,i])[0]
+        
+        rgb_mode = column
+        # Get random colours per grapheme over all sessions
+        column = np.array(col_rand)[j,i]
+  
+        # Get most common colour excluding black
+        # column = [c for c in np.array(col_rand)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
+        # if column: # Check if column is not empty after removing [0,0,0]
+          # random_mode = scipy.stats.mode(column)[0]
+        # else:
+          # random_mode = scipy.stats.mode(np.array(col)[:,i])[0]
+        # Get most common colour
+        random_mode = column
+        
+        ## HSV transformation for hue histogram
+        # hsv_rgb = cv2.cvtColor(np.array(rgb_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
+        # hsv_random = cv2.cvtColor(np.array(random_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
+        # HSV_rgb2.append(hsv_rgb)
+        # HSV_random.append(hsv_random)
+  
+        img = cv2.imread(os.path.join(PATH, file))
+        # Add colour to black space in grapheme, a.k.a pattern
+        img_c = np.where(img< 127, rgb_mode, 255)
+        img_r = np.where(img< 127, random_mode, 255)
+  
+        # cv2_imshow(img_c)
+        # plt.show()
+        # cv2_imshow(img_r)
+        # plt.show()
+        rgb.append(rgb_mode)
+        randoms.append(random_mode)
+        cv2.imwrite('../Synaesthesia/WorkingMemory/images/all_brains/emergent_colour_'+j+'_'+file, img_c)
+        cv2.imwrite('../SynaesthesiaWorkingMemory/images/all_brains/trivial_colour_'+j+'_'+file, img_r)
+        i+=1
   # zip -r res.zip res/
   return rgb, randoms
 def emergent_stats(rgb, randoms):
