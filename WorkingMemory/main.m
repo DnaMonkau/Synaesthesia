@@ -2,13 +2,13 @@ tic;
 %% Initialization
 close all; clearvars;
 %%
-num = 30;
+num = 200;
 params = model_parameters(true);
 % disp('Parameters defined');
 
 %% multiple runs
 for i = 1:num;
-    model = init_model();
+    model = init_model(i-1);
     disp('Model defined');
     % define amount of neurons dynamically
     params.quantity_neurons = prod(model.dimensions);
