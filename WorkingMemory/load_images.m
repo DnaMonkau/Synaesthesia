@@ -1,5 +1,5 @@
 function [dimensions, images] = load_images(i)
-    images_dir = 'images/';
+    images_dir = 'images/experiment_images/';
     image_names = {
         'zero.jpg', ...
         'one.jpg', ...
