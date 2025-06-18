@@ -1,4 +1,4 @@
-function [dimensions, images] = load_images()
+function [dimensions, images] = load_images(i)
     images_dir = 'images/';
     image_names = {
         'zero.jpg', ...
@@ -254,7 +254,7 @@ function [dimensions, images] = load_images()
     images = {};
   
      for name = image_names;
-        image = imread(fullfile(images_dir, name{1}));        
+        image = imread(fullfile(images_dir, name{1,1}));        
         % image = rgb2gray(image);
         % Normalise image
         image = image./255;
