@@ -1,6 +1,6 @@
-function [model] = init_model()
+function [model] = init_model(i)
 model = struct;
-[dimensions, model.images] = load_images();
+[dimensions, model.images] = load_images(i);
 params = model_parameters();
 model.T = 0 : params.step : params.t_end;
 model.T = single(model.T);
