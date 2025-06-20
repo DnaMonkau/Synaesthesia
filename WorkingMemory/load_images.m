@@ -253,11 +253,11 @@ function [dimensions, images] = load_images(i)
     };
     images = {};
   
-     for name = image_names;
+     for name = emergent_image_names;
         image = imread(fullfile(images_dir, name{1,1}));        
         % image = rgb2gray(image);
         % Normalise image
-        image = image./255;
+        image = double(image)./double(255);
         images{end + 1} = image;
     end
     dimensions = size(image);
