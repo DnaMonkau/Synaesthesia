@@ -1,0 +1,52 @@
+----------------------------------------
+Start task prologue Thu Jun 19 00:23:14 CEST 2025
+----------------------------------------
+Step ID:         47713778.
+Username:        denmon
+Group:           artiintel
+Asked resources: walltime=3-00:00:00,nodes=1,cpus=1,mem=64G
+Queue:           batch
+Compute nodes:   dccn-c089
+----------------------------------------
+End task prologue Thu Jun 19 00:23:14 CEST 2025
+----------------------------------------
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2024 The MathWorks, Inc.
+                  R2024b (24.2.0.2712019) 64-bit (glnxa64)
+                              August 22, 2024
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+    79    79     3
+
+        5000        6999
+        5999        8000
+        6999        8999
+        8000       10000
+       22999       24499
+       25499       26999
+       27999       29499
+       30499       31999
+       33000       34499
+       35500       36999
+       38000       39499
+       40499       42000
+
+slurmstepd: error: *** JOB 47713778 ON dccn-c089 CANCELLED AT 2025-06-19T00:26:24 ***
+----------------------------------------
+Start job epilogue Thu Jun 19 00:26:26 CEST 2025
+----------------------------------------
+Job ID:          47713778
+Job Exit Code:   0:0
+Username:        denmon
+Group:           artiintel
+Queue:           batch
+Compute nodes:   dccn-c089
+Asked resources: walltime=3-00:00:00,nodes=1,cpus=1,mem=64G
+Used resources:  cputime=00:03:11,walltime=00:03:11,memory=77K
+----------------------------------------
+End job epilogue Thu Jun 19 00:26:26 CEST 2025
+----------------------------------------

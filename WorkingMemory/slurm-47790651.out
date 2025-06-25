@@ -1,0 +1,27 @@
+----------------------------------------
+Start task prologue Wed Jun 25 16:56:24 CEST 2025
+----------------------------------------
+Step ID:         47790651.
+Username:        denmon
+Group:           artiintel
+Asked resources: walltime=3-00:00:00,nodes=1,cpus=1,mem=64G
+Queue:           batch
+Compute nodes:   dccn-c072
+----------------------------------------
+End task prologue Wed Jun 25 16:56:24 CEST 2025
+----------------------------------------
+slurmstepd: error: *** JOB 47790651 ON dccn-c072 CANCELLED AT 2025-06-25T16:56:40 ***
+----------------------------------------
+Start job epilogue Wed Jun 25 16:56:42 CEST 2025
+----------------------------------------
+Job ID:          47790651
+Job Exit Code:   0:0
+Username:        denmon
+Group:           artiintel
+Queue:           batch
+Compute nodes:   dccn-c072
+Asked resources: walltime=3-00:00:00,nodes=1,cpus=1,mem=64G
+Used resources:  cputime=00:00:17,walltime=00:00:17,memory=0
+----------------------------------------
+End job epilogue Wed Jun 25 16:56:42 CEST 2025
+----------------------------------------

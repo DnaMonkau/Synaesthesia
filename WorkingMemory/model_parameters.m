@@ -7,7 +7,7 @@ end
 params = struct;
 
 %% Timeline
-params.t_end = 3.5;
+params.t_end = 5.5;
 params.step = 0.0001;
 params.n = fix(params.t_end / params.step);
 
@@ -15,12 +15,12 @@ params.n = fix(params.t_end / params.step);
 params.learn_start_time = 0.5;
 params.learn_impulse_duration = 0.2;
 params.learn_impulse_shift = 0.1; %0.3
-params.learn_order =  [0, 1, 2, 3] + 1;
+params.learn_order =  [22, 2, 31,0 ] + 1;
 
-params.test_start_time = 1.2;
+params.test_start_time = 2.3;
 params.test_impulse_duration = 0.15;
 params.test_impulse_shift = 0.25; %0.4
-params.test_order =   [0, 5, 1, 6, 2, 7,  3, 8]+ 1;
+params.test_order = [22, 3, 2, 16 31, 4, 0, 25]+ 1;
 
 
 %% Applied pattern current 

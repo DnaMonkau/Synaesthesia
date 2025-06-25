@@ -257,10 +257,11 @@ function [dimensions, images] = load_images(i)
         image = imread(fullfile(images_dir, name{1,1}));        
         % image = rgb2gray(image);
         % Normalise image
-        image = double(image)./double(255);
+        image = image./255;
         images{end + 1} = image;
     end
     dimensions = size(image);
     disp(dimensions);
 end
  
+
