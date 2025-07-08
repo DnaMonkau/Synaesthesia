@@ -1,3 +1,0 @@
-Mann-Whitney MannwhitneyuResult(statistic=array([380. , 464.5, 482.5]), pvalue=array([0.00142371, 0.03080915, 0.05132722]))
-T-testTtestResult(statistic=array([-2.36935886, -2.03764388, -1.89585052]), pvalue=array([0.02058109, 0.04536684, 0.06210822]), df=array([70., 70., 70.])) 
-Anova F_onewayResult(statistic=array([5.61386139, 4.15199259, 3.5942492 ]), pvalue=array([0.02058109, 0.04536684, 0.06210822]))
