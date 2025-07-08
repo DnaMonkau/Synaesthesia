@@ -22,11 +22,11 @@ import random
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 PATH = '../Synaesthesia/WorkingMemory/images/original'
 
-def numpy2hsv(array):
-  rgbimg = np.zeros((len(array), 3))
-  for i in range(len(array)):
-    rgbimg[i] = hsv_to_rgb(array[i],1,1)
-  return rgbimg*255
+# def numpy2hsv(array):
+#   rgbimg = np.zeros((len(array), 3))
+#   for i in range(len(array)):
+#     rgbimg[i] = hsv_to_rgb(array[i],1,1)
+#   return rgbimg*255
 def create_rgb_to_bin(N, colour_set=(np.array([0.1, 0.3, 0.7, 0.9])*255).astype(int)):
   chunk = N //3
   colours = []
