@@ -5,11 +5,11 @@ Graphemes and colours are processed in distinct visual pathways. For most indivi
 
 
 ## Emergent model:
-To run the emergent model use ./ emergent.sh, this returns grapheme-colour combinations as images and the distributions in a for the network and random choice in a plot. This model was inspired by by Shriki et al.
+To run the emergent model use ./emergent.sh, this returns grapheme-colour combinations as images and the distributions in a for the network and random choice in a plot. This model was inspired by by Shriki et al.
 
 ## Working Memory model
 The working memory model needs to be ran in matlab with the image source in the same folder as the Emergent model output.
-Use Main.m to run the working memory model component. This model was an extension of Gordleeva et al.'s 2D model (to 3D).
+Use main.m to run the working memory model component. This model was an extension of Gordleeva et al.'s 2D model (to 3D).
 
 Gordleeva, S. Y., Tsybina, Y. A., Krivonosov, M. I., Ivanchenko, M. V., Zaikin, A. A., Kazantsev,
 V. B., & Gorban, A. N. (2021). Modeling working memory in a spiking neuron network
