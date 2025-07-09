@@ -27,7 +27,18 @@ PATH = '../Synaesthesia/WorkingMemory/images/original'
 #   for i in range(len(array)):
 #     rgbimg[i] = hsv_to_rgb(array[i],1,1)
 #   return rgbimg*255
-def create_rgb_to_bin(N, colour_set=(np.array([0.1, 0.3, 0.7, 0.9])*255).astype(int)):
+def create_rgb_to_bin(N, colour_set=(np.array([0.1, 0.4, 0.7, 0.9])*255).astype(int)):
+  '''
+  Create the total RGB subset in binary space
+
+  Arguments:
+  N: Number of total input neurons
+  colour_set: Colour set to use
+
+  Returns:
+  rgb_bin: RGB subset in binary space
+  colours: RGB subset
+  '''
   chunk = N //3
   colours = []
   rgb_bin = []
@@ -45,7 +56,7 @@ def create_rgb_to_bin(N, colour_set=(np.array([0.1, 0.3, 0.7, 0.9])*255).astype(
 
 #############################################################################################################################
 class GraphemeColourSynaesthesiaNet(nn.Module):
-  def __init__(self, input_dim, M, max_iter  = 10, tau=1.0,tolfun=4e-005, eta=0.01, eta_w =0.01, cross_talk = True, modalities = 2, FF = True):
+  def __init__(self, input_dim, M, max_iter  = 10, tau=1.0,tolfun=4e-005,  eta=0.01, eta_w =0.01, cross_talk = True, modalities = 2, FF = True):
     super(GraphemeColourSynaesthesiaNet, self).__init__()
 
     self.modalities = input_dim[0] # Amount of modalities
@@ -60,14 +71,14 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     self.M = M
     self.g_p_1 = 0
     self.g_p_2 = 0
-    self.time_step = self.dt = 0.01 # steps taken in ms
-    # self.transferFunction = 2 # 1 = tanh,  2= logistic function. liberman favourite parameter.
+    self.time_step = self.dt = 1.00 # steps taken in seconds
 
     self.critical_eta = None # critical learning rate
     self.variance = None # output variance for modalities
     self.tolfun = tolfun
 
     self.g = nn.Sigmoid()
+    # Initialise K
     if cross_talk:
       self.K = nn.Parameter(torch.zeros(self.M, self.M), requires_grad=True) # start at 0 fixed point or near 0
 
@@ -88,7 +99,7 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
       self.K = nn.Parameter(torch.zeros(self.M, self.M), requires_grad=False) # start at 0 fixed point
     # Initialise feedforward weights
     if self.FF:
-      self.W = nn.Parameter(torch.empty(self.M, self.N).uniform_(0,0.6), requires_grad=True)
+      self.W = nn.Parameter(torch.empty(self.M, self.N).uniform_(0,0.65), requires_grad=True)
     else:
       self.W = nn.Parameter(torch.randn(self.M, self.N), requires_grad=False)
 
@@ -101,9 +112,17 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     self.variances = torch.tensor(torch.zeros(int((max_iter)/self.time_step), self.modalities))
     self.critical_etas = torch.tensor(torch.zeros(int((max_iter)/self.time_step)))
     assert self.N <= self.M, 'This is an overcomplete network use more output than input neurons'
+  
   def steady_state(self, x, s1, s2):
     '''
     The steady state interactions
+
+    Arguments:
+    x: Input neurona
+    s1, s2: Output neurons
+
+    Returns:
+    s1, s2: Updated steady state output neurons
     '''
     # Apply first order activities to the output perception s
     s = torch.stack([self.s2, self.s1]).flatten()
@@ -114,7 +133,14 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
   def feedforward_dynamics(self, x, t, s1, s2, samp_ts):
     '''
     The feedforward dynamics  of the model
-    note: original math and paper do not consider modalities
+    Arguments:
+    x: Input
+    t (Optional for odeint): Time step
+    s1, s2: Output neurons
+    samp_ts (Optional for odeint): All time steps
+
+    Returns:
+    s1, s2: Updated steady state output neurons
     '''
     s = torch.stack([s2, s1]).flatten()
     # try:
@@ -126,48 +152,52 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     return
 
   def objective_function(self, x, E,  s1, s2):
-      '''
-      The cost function use for estimating the
-      mutual information between the in and output neurons.
-      Is used as a loss or cost function
+    '''
+    The cost function use for estimating the
+    mutual information between the in and output neurons.
+    Is used as a loss or cost function
 
-      note: original math and paper do not consider modalities
-      does not work with  k = 0
-      '''
-      s = torch.stack([s1, s2]).flatten()
-      g_p_1 = self.logistic_derivative(torch.matmul(self.W, x) + torch.matmul(self.K, s))
-      # g_p_2 = self.logistic_derivative(self.W2@x[1] + K21 * s1)
-      G = torch.diag(g_p_1)
-      # G_2 = torch.diag(g_p_2)
-      if torch.any(self.K != 0):
-        phi = ((G)**(-1) - self.K)**(-1)
-        # phi_2 = ((G_2)**(-1) - K21)**(-1)
-        chi = (phi @ self.W)
-      else:
-        phi = G
-        # phi_2 = G_2
-        chi = phi @ self.W
-        # chi_2 = phi_2 * self.W2
-        # print(np.shape(chi1))
-      chi_mult = torch.log(chi.T@chi)
-      # if torch.isnan(chi_mult).any():
-      #   E = E + 1e2
-      # else:
-      chi_mult = torch.where(torch.isnan(chi_mult),1.0, chi_mult)
-      # chi_mult = torch.where(chi_mult<1e7,torch.exp(chi_mult), chi_mult)
-      E = - 0.5 * torch.trace(torch.log(torch.exp(chi_mult)))
+    Arguments:
+    x: Input neurons
+    s1, s2: Output neurons
+    samp_ts (Optional for odeint): All time steps
 
-      # E2 = - 0.5 * torch.trace(torch.log(chi_2.T @ chi_2))
-      return E, chi, G, phi
+    Returns:
+    s1, s2: Updated steady state output neurons
+    '''
+    s = torch.stack([s1, s2]).flatten()
+    g_p_1 = self.logistic_derivative(torch.matmul(self.W, x) + torch.matmul(self.K, s))
+    # g_p_2 = self.logistic_derivative(self.W2@x[1] + K21 * s1)
+    G = torch.diag(g_p_1)
+    # G_2 = torch.diag(g_p_2)
+    if torch.any(self.K != 0):
+      phi = ((G)**(-1) - self.K)**(-1)
+      # phi_2 = ((G_2)**(-1) - K21)**(-1)
+      chi = (phi @ self.W)
+    else:
+      phi = G
+      chi = phi @ self.W
+    chi_mult = torch.log(chi.T@chi)
+    chi_mult = torch.where(torch.isnan(chi_mult),1.0, chi_mult)
+    E = - 0.5 * torch.trace(torch.log(torch.exp(chi_mult)))
 
-  def learning_rule(self, x,chi, G, phi, E):
+    return E, chi, G, phi
+
+  def learning_rule(self, x, E):
+    '''
+    The weight matrices are  update through 
+    specific learning rules
+
+    Arguments:
+    x: Input neurons
+    E: Objective/loss function
+    '''
     if self.FF:
       w_delta = - self.eta_w * torch.autograd.grad(E, self.W, retain_graph=True)[0]
       with torch.no_grad():
         self.W = nn.Parameter(self.W.clone() + w_delta)
 
     if self.cross_talk:
-      # k_delta = self.eta_k *torch.mean((chi@G).T + phi.T)
       k_delta = - self.eta_k * torch.autograd.grad(E, self.K, retain_graph=True)[0]
 
       with torch.no_grad():
@@ -176,30 +206,58 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     return
 
 
-  def stable(self, x, s1, s2):
-    alpha1 = torch.mean(s1**2)
-    alpha2 = torch.mean(s2**2)
-    Tr = 4 * alpha1 * alpha2 - alpha1 - alpha2
-    Det = - 9/16 +3*alpha1 +3*alpha2 - 4*alpha1**2 - 4 * alpha2**2 - (29/2)*alpha1*alpha2 +18*alpha1*alpha2**2 +18*alpha1**2*alpha2 - 21*alpha1**2*alpha2**2
-    self.critical_eta = -(Tr + torch.sqrt(Tr**2 - 4 * Det))/Det
-    gamma1 = abs(1+0.5*self.eta_k*(Tr + torch.sqrt(Tr**2-4*Det)))
-    gamma2 = abs(1+0.5*self.eta_k*(Tr - torch.sqrt(Tr**2-4*Det)))
-    if gamma1 < 1 and gamma2 < 1:
-     return True
-    return False
+  # def stable(self, x, s1, s2):
+  #   '''
+  #   The stable state estimaters
+
+  #   Arguments:
+  #   x: Input neurona
+  #   s1, s2: Output neurons
+
+  #   Returns:
+  #   Boolean: True if the network is stable
+  #   '''	
+  #   alpha1 = torch.mean(s1**2)
+  #   alpha2 = torch.mean(s2**2)
+  #   Tr = 4 * alpha1 * alpha2 - alpha1 - alpha2
+  #   Det = - 9/16 +3*alpha1 +3*alpha2 - 4*alpha1**2 - 4 * alpha2**2 - (29/2)*alpha1*alpha2 +18*alpha1*alpha2**2 +18*alpha1**2*alpha2 - 21*alpha1**2*alpha2**2
+  #   self.critical_eta = -(Tr + torch.sqrt(Tr**2 - 4 * Det))/Det
+  #   gamma1 = abs(1+0.5*self.eta_k*(Tr + torch.sqrt(Tr**2-4*Det)))
+  #   gamma2 = abs(1+0.5*self.eta_k*(Tr - torch.sqrt(Tr**2-4*Det)))
+  #   if gamma1 < 1 and gamma2 < 1:
+  #    return True
+  #   return False
   #   return Det
+
   def convergence(self, s1_prev, s2_prev, s1, s2, loss, i):
+    '''
+    Calculates the convergence of the model 
+    around the objective function
+
+    Arguments:
+    s1_prev, s2_prev: Output neurons of the previous time step
+    s1, s2: Output neurons of the current time step
+    loss: Objective/loss function
+
+    Returns:
+    Boolean: True if the model has converged
+    '''
     diff1 = abs(s1 - s1_prev)
     diff2 = abs(s2 - s2_prev)
-    # difference  = torch.mean(torch.hstack([diff1, diff2])) < self.tolfun
     difference = abs(self.losses[i-1]- loss) < self.tolfun
     return difference.all()
 
-  def forward(self, xs, max_iter=10, d=True):
-    status = []
+  def forward(self, xs, max_iter=1000, d=True, W_freeze=0.1):
+    '''
+    The time step updates to the network
+    '''
+    samp_ts = torch.linspace(0., int((max_iter)/self.time_step), int(max_iter/self.time_step))
     loss = torch.tensor([0.], requires_grad=True)
     iterations = max_iter // self.time_step
     old_K = self.K.clone()
+    s1_prev, s2_prev = -np.inf, -np.inf
+    status = []
+    converged = []
     self.Ks = []
 
     # In case the data is concatenated split iterations
@@ -207,24 +265,17 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
 
       index = int(iterations // len(xs) )+1
 
-    samp_ts = torch.linspace(0., int((max_iter)/self.time_step), int(max_iter/self.time_step))
-    converged = []
-    s1_prev, s2_prev = -np.inf, -np.inf
-
     for i in tqdm(range(1,int(iterations))):
       # use the proper data based on the split
-      old_loss = loss.clone()
       x = xs[int(i//index)-1].flatten()
       self.x = x
       with torch.no_grad():
+        # setup local output neuron values
         s1 = self.s1.clone()
         s2 = self.s2.clone()
+        # Add K to list
         self.Ks.append(self.K.clone())
-
-        if i == iterations//10:
-          self.FF = False
-        #   plt.imshow(np.reshape(self.x[:64].detach().numpy(),(8,8)))
-        #   plt.show()
+        # Stable versus unstable dynamics
         if (abs(self.K) == 0).all():
           status.append('Stable')
           s1, s2 = self.steady_state(x, s1, s2)
@@ -232,42 +283,59 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
           status.append('Unstable')
           self.feedforward_dynamics(x, i, s1, s2, samp_ts)
           self.FF = False
-
-      # self.s2 = self.colour_cat(self.s2)
-      # self.s2 = self.colour_bin(self.s2)
+      # Calculate the loss function
       loss, chi, G, phi = self.objective_function(x, loss, s1, s2)
+      # Check convergence of loss function
       if self.convergence( s1_prev, s2_prev, s1, s2, loss, i): # steady-stae
         converged.append(i)
         print('converged')
         break
-      self.learning_rule(x,chi, G, phi, loss)
+      # Update lists and parameters
+      self.learning_rule(x, loss)
       self.losses[i] = loss
       loss.backward()
-
       self.optimizer.step()
       self.optimizer.zero_grad()
       if torch.isnan(self.K).any():
         self.K = nn.Parameter(old_K.clone())
-      self.stable(x, s1, s2)
-
-      self.variances[i,0] = torch.mean(self.s1**2) - torch.mean(self.s1)**2
-      self.variances[i,1] = torch.mean(self.s2**2) - torch.mean(self.s2)**2
-     # self.critical_etas[i] = self.critical_eta
       s1_prev, s2_prev = s1.clone(), s2.clone()
-
       with torch.no_grad():
         self.K.fill_diagonal_(0)
+    # Share whether the network has converged or not
     if len(converged) != 0:
       print('\n --- \n Converged at iteration: ', converged[0], '\n --- \n')
-      # print('\n --- \n Diverged or reached max iterations after at iteration: ', converged[-1], '\n --- \n')
     else:
       print('\n --- Did not converge \n ---\n ')
+    # Calculate output in binary space
     self.s2 = self.rgb_bin_closeness(len(self.s2), self.s2)[0]
     return status, converged
+ 
   def train(self, x, max_iter):
+    '''
+    Trains the network
+
+    Arguments:
+    x: Input neurons
+    max_iter: Maximum number of iterations
+
+    Returns:
+    status: Whether the network has converged or not
+    converged: Whether the network has converged or not
+    '''
     status, converged = self.forward(x, max_iter,  d=True)
     return status, converged
+ 
   def predict(self, x, s):
+    '''
+    Predicts the output neurons
+
+    Arguments:
+    x: Input neurons
+    s: Output neurons
+
+    Returns:
+    s: Updated output neurons
+    '''
     s1, s2 = torch.reshape(s,  (2,self.M//2))
     s = torch.stack([s2, s1]).flatten()
     s = self.g(torch.matmul(self.W, x) + torch.matmul(self.K, s.T))
@@ -286,114 +354,113 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     return self.logistic_derivative(x) * (1 - 2*self.g(x))
   def third_logistic_derivative(self, x):
     return self.second_logistic_derivative(x)* (1 - 2*self.g(x)) - 2*self.logistic_derivative(x)**2
-  def colour_cat(self, tensor, colours = torch.tensor([0.1, 0.3, 0.7, 0.9])):
+  def colour_cat(self, tensor, colours = torch.tensor([0.1, 0.4, 0.7, 0.9])):
     cat_array =[]
     for i in range(len(tensor)):
       index = torch.argmin(abs(tensor[i] - colours))
       cat_array.append(colours[index])
     return torch.tensor(cat_array)
 
-  def rgb_bin_closeness(self, N, array, colour_set=torch.tensor([0.1, 0.3, 0.7, 0.9])*255, dtype =int):
+  def rgb_bin_closeness(self, N, array, colour_set=torch.tensor([0.1, 0.4, 0.7, 0.9])*255, dtype =int):
+    '''
+    Estimates the binary code of the RGB chunk
+    
+    Arguments:
+    N: Number of total input neurons
+    array: Neuron array
+    colour_set: Colour set to use
+    dtype: Data type
+
+    Returns:
+    array: Updated (binary) output neurons
+    '''
     array = array.detach().numpy()
-    chunk = N //3
+    chunk = N//3
+    # split intial neuron array into chunks
     r = array[:N//3].astype(int)
     g = array[N//3:-N//3].astype(int)
     b = array[-N//3:].astype(int)
+    # Take only the last 8 neurons  for the actual RGB binary code
     r_dec = int(''.join(map(str,(r[-8:]))),2)
     g_dec = int(''.join(map(str,(g[-8:]))),2)
     b_dec = int(''.join(map(str,(b[-8:]))),2)
+    # Calculate the closest colour in the colour set
     r  = int(colour_set[torch.argmin(abs(colour_set - r_dec))].item())
     g  = int(colour_set[torch.argmin(abs(colour_set - g_dec))].item())
     b  = int(colour_set[torch.argmin(abs(colour_set - b_dec))].item())
+    # Binarise this colour
     r_chunk = list(str(bin(r)[2:]).zfill(chunk))
     g_chunk = list(str(bin(g)[2:]).zfill(N-chunk*2))
     b_chunk = list(str(bin(b)[2:]).zfill(chunk))
+    # Concatenate and share the neuron array
     arr = np.array([r_chunk+g_chunk+b_chunk]).astype(int)
     array = torch.tensor(arr)
-
     return array
 #########################################################################################################
 def train(emergence_iterations=50):
   img = cv2.imread(os.path.join(PATH, 'zero.jpg'))
   img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
-  # flat gray scale number array
+# Flat gray scale number array
   x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
-  # normalise
+  # Reset range to [0,1] 
   x1 = x1/255
-  # colour category per pixel 0=original  blue=green
-  # x2 = torch.from_numpy(np.random.choice([0, 0.33, 0.66, 0.99], size = len(x1)).astype('float32'))
+  # Colour category per ~21 neurons in binary code
   rgb_bin, _ = create_rgb_to_bin(len(x1))
-  x2 = torch.from_numpy(rgb_bin[0])
 
+  # Sample data and initialise network
   x2 = torch.from_numpy(rgb_bin[0])
-
   simulation_emergence_data = torch.stack([x1, x2])
   E_Network = GraphemeColourSynaesthesiaNet(np.shape(simulation_emergence_data), M=len(x1)*2, max_iter=emergence_iterations)
-  #syn
-  weights1 = E_Network.W
-  Isynaesthesias = []
-  convergences = []
-  # bw = image_names = [
-  #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
-  #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
-  #     ]
+  # Create emergent data
   x = []
-  for i in range(3): # train on all colour grapheme combinations
-    j = 0
-    random.shuffle(rgb_bin)
-
+  # Shuffle (4^3=64) colours around
+  random.shuffle(rgb_bin)
+  # Create all colour-grapheme combinations
+  for i in range(len(rgb_bin)): 
     for file in os.listdir(PATH):
         if 'jpg'  in file:
             img = cv2.imread(os.path.join(PATH, file))
             img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
             x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
-            # normalise
-            x1 = x1<127
-            # colour category per pixel 0=original  blue=green
-            # x2 = torch.from_numpy(np.random.choice(range(0,360), size = len(x1)).astype('float32'))
-            x2 = torch.from_numpy(rgb_bin[j].astype(np.float32))
-            # normalise
-
+            # Reset range to [0,1] 
+            x1 = x1/255
+            # Colour category per pixel 0=original  blue=green
+            x2 = torch.from_numpy(rgb_bin[i].astype(np.float32))
+            # Add both modalities' data to the input neurons
             simulation_emergence_data = torch.stack([x1, x2])
             x.append(simulation_emergence_data)
-            j+=1
+  # Shuffle around the  combinations such that all graphemes are presented
   x = torch.stack(x)
   shuffled_indices = torch.randperm(x.shape[0])
-
   x = x[shuffled_indices]
-
-  x = np.array(x)
-  x = torch.from_numpy(x)
+  # Train the network on the shuffled grapheme-colour data 
   status, converged = E_Network.train(x, emergence_iterations)
   return E_Network, status, converged
 def run():
   x = []
-  col= []
-  col_rand = []
-  # bw = image_names = [
-  #         'zero.jpg', 'one.jpg', 'two.jpg', 'three.jpg', 'four.jpg',
-  #         'five.jpg', 'six.jpg', 'seven.jpg', 'eight.jpg', 'nine.jpg'
-  #     ]
+  col= [] # Emergent synaesthetic colour list
+  col_rand = [] # Random colour list
+  # Retrieve all grapheme files for prediction
   for file in os.listdir(PATH):
       if 'jpg' in file:
         img = cv2.imread(os.path.join(PATH, file))
         img = cv2.resize(img, (0,0), fx=0.10, fy=0.10)
         x1 = torch.from_numpy((cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).flatten()).astype('float32'))
-        # normalise
+        # Reset range to [0,1] 
         x1 = x1/255
-        # colour category per pixel 0=original  blue=green
-        x2 = torch.zeros(len(x1))
+        # Colour category per pixel 0=original  blue=green
+        x2 = torch.zeros(len(x1
+        # Add both modalities' data to the input neurons
         simulation_emergence_data = torch.stack([x1, x2])
         x.append(simulation_emergence_data)
-  chunk = int(len(x2)/3) # a chunk for every channel, rgb = 3
-  S = 3000 # sessions
+  chunk = int(len(x2)/3) # Colour channel chunks, rgb = 3
+  S = 100 # Model instances / participants
+  iter = 1000 # Maximum iterations for training
   for i in range(S):
-    colour_random_mean = []
-    colour_predictionhsv_median = []
-    colour_predictionhsv_mean = []
+    colour_random = []
+    colour_prediction= []
     colours = []
-
-    # train
+    # Train
     Net, status, converged = train(10)
     # Run predictions per grapheme
     for j in range(len(x)):
@@ -434,55 +501,34 @@ def run():
     col_rand.append(colour_random_mean)
   return col, col_rand
 def colour_in_grapheme(col, col_rand):
-  HSV_rgb2 = []
-  HSV_random = []
   rgb = []
   randoms = []
+  letters = []
+
+  rgbb = []
+  lettersb = []
   for j in range(len(col)):
     i=0
     for file in os.listdir(PATH):
       if 'jpg'  in file:
         # Get emergent colours per grapheme over all sessions
         column = np.array(col)[j, i]
-        
-        # Get most common colour excluding black
-        # column = [c for c in np.array(col)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
-        # Get most common colour excluding black
-        # if column: # Check if column is not empty after removing [0,0,0]
-          # rgb_mode = scipy.stats.mode(column)[0]
-        # else:
-          # rgb_mode = scipy.stats.mode(np.array(col)[:,i])[0]
-        
-        rgb_mode = column
+        rgb_M = column
         # Get random colours per grapheme over all sessions
         column = np.array(col_rand)[j,i]
-  
-        # Get most common colour excluding black
-        # column = [c for c in np.array(col_rand)[:,i] if not np.array_equal(c, np.array([0,0,0]))]
-        # if column: # Check if column is not empty after removing [0,0,0]
-          # random_mode = scipy.stats.mode(column)[0]
-        # else:
-          # random_mode = scipy.stats.mode(np.array(col)[:,i])[0]
-        # Get most common colour
-        random_mode = column
-        
-        ## HSV transformation for hue histogram
-        # hsv_rgb = cv2.cvtColor(np.array(rgb_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
-        # hsv_random = cv2.cvtColor(np.array(random_mean* 255).astype(np.uint8).reshape(1, 1, 3),cv2.COLOR_RGB2HSV)[0,0]
-        # HSV_rgb2.append(hsv_rgb)
-        # HSV_random.append(hsv_random)
-  
+        random_M = column
+        # Load images
         img = cv2.imread(os.path.join(PATH, file))
         # Add colour to black space in grapheme, a.k.a pattern
-        img_c = np.where(img< 127, rgb_mode, 255)
-        img_r = np.where(img< 127, random_mode, 255)
-  
+        img_c = np.where(img< 127, rgb_M, 255)
+        img_r = np.where(img< 127, random_M, 255)
         # cv2_imshow(img_c)
         # plt.show()
         # cv2_imshow(img_r)
         # plt.show()
-        rgb.append(rgb_mode)
-        randoms.append(random_mode)
+        rgb.append(rgb_M)
+        randoms.append(random_M)
+        letters.append(file)
         cv2.imwrite('../Synaesthesia/WorkingMemory/images/all_brains/emergent_colour_'+str(j)+'_'+file, img_c)
         cv2.imwrite('../SynaesthesiaWorkingMemory/images/all_brains/trivial_colour_'+str(j)+'_'+file, img_r)
         i+=1
