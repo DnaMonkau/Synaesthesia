@@ -7,7 +7,6 @@ Graphemes and colours are processed in distinct visual pathways. For most indivi
 ## Emergent model:
 To run the emergent model use ./emergent.sh, this returns grapheme-colour combinations as images and the distributions in a for the network and random choice in a plot. This model was inspired by by Shriki et al.
 Images are output as  group_letter_number.png
-![emergent_model (15)](https://github.com/user-attachments/assets/5f868578-98a1-47bd-9365-dc3fe9868ae2)
 
 ## Working Memory model
 The working memory model needs to be ran in matlab with the image source in the same folder as the Emergent model output.
