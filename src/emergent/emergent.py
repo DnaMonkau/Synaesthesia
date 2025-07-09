@@ -1,4 +1,3 @@
-
 from itertools import product
 import numpy as np
 from colorsys import hsv_to_rgb
@@ -504,9 +503,6 @@ def colour_in_grapheme(col, col_rand):
   rgb = []
   randoms = []
   letters = []
-
-  rgbb = []
-  lettersb = []
   for j in range(len(col)):
     i=0
     for file in os.listdir(PATH):
@@ -533,7 +529,7 @@ def colour_in_grapheme(col, col_rand):
         cv2.imwrite('../SynaesthesiaWorkingMemory/images/all_brains/trivial_colour_'+str(j)+'_'+file, img_r)
         i+=1
   # zip -r res.zip res/
-  return rgb, randoms
+  return rgb, randoms, letters
 def emergent_stats(rgb, randoms):
   channels = ['red', 'green', 'blue']
   sns.set_palette(sns.diverging_palette(145, 300, s=60, n=3))
@@ -554,8 +550,71 @@ def emergent_stats(rgb, randoms):
     f.write("Mann-Whitney {mann:}\nT-test{ttest} \nAnova {anova}".format(mann=scipy.stats.mannwhitneyu(rgb, randoms), 
                                          ttest = scipy.stats.ttest_ind(rgb, randoms), 
                                          anova = scipy.stats.f_oneway(rgb, randoms)))
+###################################################################################################
+def colour_graphs_plot(randoms, letters, rgb):
+  graphemes = np.array(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'zero', 'a', 'b', 'c',\
+             'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
+  grapheme_true = np.array(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c',\
+             'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
+  rgb_bin, colours = create_rgb_to_bin(64)
+  emergent = pd.DataFrame(np.zeros((64, 36)), index=range(64), columns = graphemes)
+  emer_graphs = {grapheme: [] for grapheme in graphemes}
+  for i, color in enumerate(colours_v):
+    for letter, colour_val in zip(letters, rgb):
+      for grapheme in graphemes:
+        if (grapheme + '.jpg') == letter and (colour_val == color).all():
+          emergent.loc[i, grapheme] +=1
 
+          emer_graphs[grapheme].append(i)
+  random_pd = pd.DataFrame(np.zeros((64, 36)), index=range(64), columns = graphemes)
+  graphs = {grapheme: [] for grapheme in graphemes}
+  for i, color in enumerate(colours_v):
+    for letter, colour_val in zip(letters, randoms):
+      for grapheme in graphemes:
+        if (grapheme + '.jpg') == letter and (colour_val == color).all():
+          graphs[grapheme].append(i)
+          random_pd.loc[i, grapheme] += 1
+  random_pd = pd.DataFrame.from_dict(graphs)
+  emergent = pd.DataFrame.from_dict(emer_graphs)
+  from matplotlib import colors
+  c = np.array([np.array(cul) for cul in colours_v])
+  cmap = colors.ListedColormap(np.array(c)/255)
+  color_squares = np.array([[[r/255, g/255, b/255]] for r, g, b in colours_v])
+  hsv_squares = [hsvs]
+  sq = np.reshape(color_squares, ( 3, 1, 64))
+  fig, ax = plt.subplots(len(graphemes), 1, figsize=(40,10))
+  # plt.yticks(range(36), grapheme_true)
+  ax[0].set_title('Emergent Synaesthetic Colour Distributions N=100 (Graphemes)', fontsize=20)
+  for i,g in enumerate(graphemes):
+    p =np.array([emergent[g]])
+    ax[i].imshow(p,  cmap=cmap,extent=[0, len(emergent)*10, -10, 10] )
+    ax[i].set_ylabel(grapheme_true[i], fontsize=15)
+    ax[i].set_xticks([])
+    ax[i].set_yticks([])
+  plt.xlabel('Participants', fontsize=20)
+  plt.savefig('emergent_colour.jpg')
+  # plt.xticks(range(200))
+  plt.show()
+
+  fig, ax = plt.subplots(len(graphemes), 1, figsize=(30,10))
+  ax[0].set_title('Random Colour Distributions N=100 (Graphemes)',  fontsize=20)
+  for i,g in enumerate(graphemes):
+    p =np.array([random_pd[g]])
+    ax[i].set_ylabel(grapheme_true[i], fontsize=15)
+    ax[i].imshow(p,  cmap=cmap,extent=[0, len(emergent)*10, -10, 10] )
+    ax[i].set_xticks([])
+    ax[i].set_yticks([])
+    # plt.title(g)
+  plt.xlabel('Participants', fontsize=20)
+  plt.savefig('random_colour.jpg')
+  plt.show()
+  plt.imshow(np.rot90(color_squares), extent=[10, len(color_squares), 0,10])
+  plt.xticks([])
+  plt.yticks([])
+  plt.title('Discrete Colours N=64',  fontsize=20)
+  plt.savefig('colour_set.jpg'
 ###################################################################################################
 col, col_rand = run()
-rgb, randoms = colour_in_grapheme(col, col_rand)
+rgb, randoms, letters = colour_in_grapheme(col, col_rand)
 emergent_stats(rgb, randoms)
+colour_graphs_plot(randoms, letters, rgb)
