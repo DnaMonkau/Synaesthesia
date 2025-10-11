@@ -2,6 +2,9 @@ function [model] = init_model(i)
 model = struct;
 [dimensions, model.images] = load_images(i);
 params = model_parameters();
+otherdims = repmat({':'},1, length(dimensions));
+
+
 model.T = 0 : params.step : params.t_end;
 model.T = single(model.T);
 model.dimensions = dimensions;
@@ -22,24 +25,32 @@ model.Iastro_neuron_line = zeros(params.quantity_neurons, 1,'logical');
 model.Mask_line = zeros(1, params.quantity_neurons,'logical');
 
 %% Neuron activity
-if length(dimensions) == 2
-    model.neuron_astrozone_activity = zeros(params.mastro, params.nastro, 1,'int8');
-    model.neuron_astrozone_spikes   = zeros(params.mastro, params.nastro, params.n,'int8');
-else
+if length(dimensions) == 3
     model.neuron_astrozone_activity = zeros(params.mastro, params.nastro, dimensions(3), 1,'int8');
     model.neuron_astrozone_spikes   = zeros(params.mastro, params.nastro, dimensions(3), params.n,'int8');
+else
+    model.neuron_astrozone_activity = zeros(params.mastro, params.nastro, 1,'int8');
+    model.neuron_astrozone_spikes   = zeros(params.mastro, params.nastro, params.n,'int8');
 end
 model.dimensions_n =  [model.dimensions, params.n];
+if length(dimensions) == 3
+    model.astro_dimensions =  [params.mastro, params.nastro, dimensions(3), 1];
+    model.astro_dimensions_n =  [params.mastro, params.nastro, dimensions(3), params.n];
+else
+    model.astro_dimensions =  [params.mastro, params.nastro, 1];
+    model.astro_dimensions_n =  [params.mastro, params.nastro, params.n];
+
+end
 %% Astrocytes
-model.Ineuro = zeros(params.mastro, params.nastro, params.n,'int8');
-model.Iastro_neuron = zeros(params.mastro, params.nastro, params.n, 'logical');
-model.Ca = zeros(params.mastro, params.nastro, 1,'double');
+model.Ineuro = zeros(model.astro_dimensions_n,'int8');
+model.Iastro_neuron = zeros(model.astro_dimensions_n, 'logical');
+model.Ca = zeros(model.astro_dimensions,'double');
 model.Ca_size_neuros = zeros(model.dimensions_n, 'double');
-model.H = zeros(params.mastro, params.nastro, 1,'double');
-model.IP3 = zeros(params.mastro, params.nastro, 1,'double');
-model.Ca(:,:,1) = params.ca_0;
-model.H(:,:,1) = params.h_0;
-model.IP3(:,:,1) = params.ip3_0;
+model.H = zeros(model.astro_dimensions,'double');
+model.IP3 = zeros(model.astro_dimensions,'double');
+model.Ca(otherdims{:},1) = params.ca_0;
+model.H(otherdims{:},1) = params.h_0;
+model.IP3(otherdims{:},1) = params.ip3_0;
 
 %% Iapp and record video
     model.T_Iapp = [

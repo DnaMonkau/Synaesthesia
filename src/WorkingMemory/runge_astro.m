@@ -18,8 +18,8 @@ function f = runge_astro(t, X, I_neuro, sum_Ca, sum_IP3)
     h = Q2 / (Q2 + X(1));
     Tn = 1.0 / (a2 * (Q2 + X(1)));
     Iplc = v4 * ((X(1) + (1.0 - a) * k4) / (X(1) + k4));
-    f(1) = Ier - Ipump + Ileak + Iin - Iout + params.dCa .* sum_Ca; 
+    f(1) = Ier - Ipump + Ileak + Iin - Iout + params.dCa .* sum_Ca(1); 
     f(2) = (h - X(2)) / Tn;
-    f(3) = (IP3s - X(3)) * Tr + Iplc + I_neuro + + params.dIP3 .* sum_IP3;
+    f(3) = (IP3s - X(3)) * Tr + Iplc + I_neuro(1) + + params.dIP3 .* sum_IP3(1);
     f = f';
 end

@@ -256,11 +256,14 @@ function [dimensions, images] = load_images(i)
      for name = trivial_image_names;
         image = imread(fullfile(images_dir, name{1,1}));        
         % image = rgb2gray(image);
-        % Normalise image
-        image = image./255;
+        % Rescale image
+        if max(image) > 1
+        	disp('reducing...');
+        	image = image / 255;
+        end
         images{end + 1} = image;
+        
     end
     dimensions = size(image);
 end
- 
 
