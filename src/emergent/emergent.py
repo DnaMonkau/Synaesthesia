@@ -125,7 +125,7 @@ class GraphemeColourSynaesthesiaNet(nn.Module):
     '''
     # Apply first order activities to the output perception s
     s = torch.stack([self.s2, self.s1]).flatten()
-    s = self.g(torch.matmul(self.W, x) + torch.matmul(self.K, s))
+    s = self.g(torch.matmul(self.W, x) + torch.matmul(self.K, s)+1e4)
     self.s1, self.s2 = s[:self.M//2], s[self.M//2:]
     return self.s1, self.s2
 
@@ -448,7 +448,7 @@ def run():
         # Reset range to [0,1] 
         x1 = x1/255
         # Colour category per pixel 0=original  blue=green
-        x2 = torch.zeros(len(x1
+        x2 = torch.zeros(len(x1))
         # Add both modalities' data to the input neurons
         simulation_emergence_data = torch.stack([x1, x2])
         x.append(simulation_emergence_data)
@@ -493,11 +493,11 @@ def run():
       # Add rgb values
       rand_rgb_space = np.array([rr, gr, br])
 
-      colour_predictionhsv_mean.append(rgb_space)
-      colour_random_mean.append(rand_rgb_space)
+      colour_prediction.append(rgb_space)
+      colour_random.append(rand_rgb_space)
 
-    col.append(colour_predictionhsv_mean)
-    col_rand.append(colour_random_mean)
+    col.append(colour_prediction)
+    col_rand.append(colour_random)
   return col, col_rand
 def colour_in_grapheme(col, col_rand):
   rgb = []
@@ -612,9 +612,10 @@ def colour_graphs_plot(randoms, letters, rgb):
   plt.xticks([])
   plt.yticks([])
   plt.title('Discrete Colours N=64',  fontsize=20)
-  plt.savefig('colour_set.jpg'
+  plt.savefig('colour_set.jpg')
 ###################################################################################################
 col, col_rand = run()
 rgb, randoms, letters = colour_in_grapheme(col, col_rand)
 emergent_stats(rgb, randoms)
 colour_graphs_plot(randoms, letters, rgb)
+
