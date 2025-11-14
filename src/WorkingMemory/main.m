@@ -2,12 +2,12 @@ tic;
 %% Initialization
 close all; clearvars;
 %%
-num = 100;
+num = 1;
 params = model_parameters(true);
 % disp('Parameters defined');
 
 %% multiple runs
-for i = 50:num;
+for i = 1:num;
     model = init_model(i-1);
     disp('Model defined');
     % define amount of neurons dynamically
@@ -36,9 +36,9 @@ for i = 50:num;
     fprintf(['Memory performance per image: ', fmt, '\n'], ...
         memory_performance.learned_pattern_similarities);
 
-    txt = sprintf('results/extended_trivial_performance_%.1f.mat', i);
+    %txt = sprintf('results/extended_trivial_performance_%.1f.mat', i);
 
-    save(txt);
+    %save(txt);
      %   "model.V_line", ...
       %  "model.Iapp_v_full", ...
        % "model.T_record_met", "model.dimensions"," memory_performance")
@@ -50,11 +50,11 @@ for i = 50:num;
     figure();
     ax = subplot(1, 1,1); hold on
     % For all trials...
-    sptimes = model.V_line ;
-    T = length(sptimes);
+    
+    T = length(model.V_line);
     for iTrial = 1:T
-                      
-        spks            = find(sptimes(iTrial,:)>-70);         % Get all spikes of respective trial    
+    display(iTrial);                  
+        spks            = find(model.V_line(iTrial,:)>-70);         % Get all spikes of respective trial    
         plot( spks(1,:),iTrial, '.k')
     end
     ax.YLim             = [0 T+1];
@@ -63,7 +63,7 @@ for i = 50:num;
     
     ax.XLabel.String  	= 'Time [s]';
     ax.YLabel.String  	= 'Neurons';
-    savefig('Rasterplot.fig')
+    savefig('images/emergent_Rasterplot.fig')
     %% Predicted learned images
     % show_video(memory_performance.freq_images); % by frequency
     % 
