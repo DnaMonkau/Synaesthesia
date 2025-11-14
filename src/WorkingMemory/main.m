@@ -42,7 +42,28 @@ for i = 50:num;
      %   "model.V_line", ...
       %  "model.Iapp_v_full", ...
        % "model.T_record_met", "model.dimensions"," memory_performance")
-
+    %% Raster plot
+    %%% Inspired by Felix Schneider
+    %%% Auditory Cognition Group: https://www.auditorycognition.org/
+    %%% Biosciences Institute, Newcastle University Medical School
+    %%% 02/2020
+    figure();
+    ax = subplot(1, 1,1); hold on
+    % For all trials...
+    sptimes = model.V_line ;
+    T = length(sptimes);
+    for iTrial = 1:T
+                      
+        spks            = find(sptimes(iTrial,:)>-70);         % Get all spikes of respective trial    
+        plot( spks(1,:),iTrial, '.k')
+    end
+    ax.YLim             = [0 T+1];
+    ax.XLim             = [0 length(spks)];
+    ax.YTick            = [0 :T+1];
+    
+    ax.XLabel.String  	= 'Time [s]';
+    ax.YLabel.String  	= 'Neurons';
+    savefig('Rasterplot.fig')
     %% Predicted learned images
     % show_video(memory_performance.freq_images); % by frequency
     % 
