@@ -52,13 +52,10 @@ for i = 1:num;
     % For all trials...
     
     T = length(model.V_line);
-    for iTrial = 1:T
-    display(iTrial);                  
-        spks            = find(model.V_line(iTrial,:)>-70);         % Get all spikes of respective trial    
-        plot( spks(1,:),iTrial, '.k')
-    end
+    [spksr, spksc ]           = find(sptimes>-70);         % Get all spikes of respective trial    
+        plot( spksc,spksr, '.k')
     ax.YLim             = [0 T+1];
-    ax.XLim             = [0 length(spks)];
+    ax.XLim             = [0 max(spks)];
     ax.YTick            = [0 :T+1];
     
     ax.XLabel.String  	= 'Time [s]';
