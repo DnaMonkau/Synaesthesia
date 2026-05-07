@@ -15,6 +15,7 @@ Use main.m to run the working memory model component. This model was an extensio
 Gordleeva, S. Y., Tsybina, Y. A., Krivonosov, M. I., Ivanchenko, M. V., Zaikin, A. A., Kazantsev,
 V. B., & Gorban, A. N. (2021). Modeling working memory in a spiking neuron network
 accompanied by astrocytes. Frontiers in Cellular Neuroscience, 15 , 631485.
+
 Shriki, O., Sadeh, Y., & Ward, J. (2016). The emergence of synaesthesia in a neuronal network
 model via changes in perceptual sensitivity and plasticity. PLoS computational biology, 12 (7),
 e1004959
