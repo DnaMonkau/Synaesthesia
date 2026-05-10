@@ -2,12 +2,12 @@ tic;
 %% Initialization
 close all; clearvars;
 %%
-num = 100;
+num = 11;
 params = model_parameters(true);
 % disp('Parameters defined');
 
 %% multiple runs
-for i = 75:num;
+for i = 1:num;
     model = init_model(i-1);
     disp('Model defined');
     % define amount of neurons dynamically
@@ -36,13 +36,13 @@ for i = 75:num;
     fprintf(['Memory performance per image: ', fmt, '\n'], ...
         memory_performance.learned_pattern_similarities);
 
-    txt = sprintf('results/dissimilar_performance_%.1f.mat', i);
+    txt = sprintf('results/dissimilar_trivial_performance_%.1f.mat', i);
 
     save(txt);
      %   "model.V_line", ...
       %  "model.Iapp_v_full", ...
        % "model.T_record_met", "model.dimensions"," memory_performance")
- 
+disp(txt); 	
 
 %% Predicted learned images
     % show_video(memory_performance.freq_images); % by frequency

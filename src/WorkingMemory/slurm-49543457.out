@@ -1,0 +1,14 @@
+----------------------------------------
+Start job epilogue Sun Nov 16 18:16:52 CET 2025
+----------------------------------------
+Job ID:          49543457
+Job Exit Code:   0:0
+Username:        denmon
+Group:           artiintel
+Queue:           batch
+Compute nodes:   dccn-c089
+Asked resources: walltime=3-00:00:00,nodes=1,cpus=1,mem=64G
+Used resources:  cputime=01:29:24,walltime=01:29:24,memory=36G
+----------------------------------------
+End job epilogue Sun Nov 16 18:16:52 CET 2025
+----------------------------------------

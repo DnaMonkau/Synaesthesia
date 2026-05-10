@@ -252,7 +252,7 @@ function [dimensions, images] = load_images(i)
         'nine_binare_color.jpg'
     };
     images = {};
-  
+
      for name = trivial_image_names;
         image = imread(fullfile(images_dir, name{1,1}));        
         % image = rgb2gray(image);
@@ -262,7 +262,7 @@ function [dimensions, images] = load_images(i)
         	image = image / 255;
         end
         images{end + 1} = image;
-        
+
     end
     dimensions = size(image);
 end
